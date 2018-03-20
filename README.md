@@ -1,1 +1,1 @@
-#H1 Jääkiekkotulospalvelu
+# Jääkiekkotulospalvelu
