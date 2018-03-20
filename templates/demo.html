@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<p>
+  Hei maailma!
+</p>
+<p>
+  <!-- etsitään muuttujaa nimeltä nimi ja asetetaan sen arvo tähän -->
+  {{ nimi }}
+</p>
+
+<ul>
+  {%for arvo in lista %}
+  <li>{{ arvo }}</li>
+  {% endfor %}
+</ul>
+
+<table>
+  <tr>
+    <th>Nimi</th>
+  </tr>
+  {% for esine in esineet %}
+  <tr>
+    <td>{{ esine.name }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
