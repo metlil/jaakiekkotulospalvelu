@@ -1,4 +1,5 @@
 # Jääkiekkotulospalvelu
+https://jaakiekkotulospalvelu.herokuapp.com/
 
 Tarkoitus välittää jääkiekkopelien loppu- ja välituloksia reaaliaikaisesti. Tulospalvelutietokannasta saadaan raportteina päättyneen ja keskeneräisen ottelun tapahtumat (maalit, jäähyt yms) ja kokoonpano. Sieltä saadaan myös sarjataulukko. Mahdollisesti yksittäisten pelaajien kaikki tehdyt maalit, syötöt ja jäähyt.
 
