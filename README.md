@@ -15,4 +15,7 @@ Toimintoja
 *	otteluiden tulokset
 *	sarjataulukko
 
+User storyt:
+
+
 
