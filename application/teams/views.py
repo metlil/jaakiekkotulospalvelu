@@ -2,6 +2,7 @@ from flask import redirect, render_template, request, url_for
 
 from application import app, db
 from application.teams.models import Team
+from flask_login import login_required
 
 
 @app.route("/teams/", methods=["GET"])
@@ -10,6 +11,7 @@ def teams_index():
 
 
 @app.route("/teams/new/")
+@login_required
 def teams_form():
     return render_template("teams/new.html")
 
@@ -30,6 +32,7 @@ def teams_modify(team_id):
 
 
 @app.route("/teams/<team_id>/", methods=["GET", "POST"])
+@login_required
 def team_page(team_id):
     if request.method == 'POST':
         return teams_modify(team_id)
@@ -38,6 +41,7 @@ def team_page(team_id):
 
 
 @app.route("/teams/", methods=["POST"])
+@login_required
 def teams_create():
     form = request.form
     t = Team(form.get("name"), form.get("city"))
