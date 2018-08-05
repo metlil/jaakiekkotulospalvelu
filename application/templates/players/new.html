@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <form method="POST" action="{{ url_for('players_create') }}">
+        <table>
+            <tr>
+                <td>
+                    {{ form.firstname.label }}
+                </td>
+                <td>
+                    {{ form.firstname }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.lastname.label }}
+                </td>
+                <td>
+                    {{ form.lastname }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.number.label }}
+                </td>
+                <td>
+                    {{ form.number }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="Add a new player"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

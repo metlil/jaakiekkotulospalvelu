@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <table>
+        <tr>
+            <th>Player firstname</th>
+            <th>Player lastname</th>
+            <th>Player number</th>
+        </tr>
+        {% for player in players %}
+            <tr>
+                <td>
+                    {#                    <a href="{{ url_for('player_page', player_id= player.id) }}">#}
+                    {{ player.firstname }}
+                    {#                    </a>#}
+                </td>
+                <td>{{ player.lastname }}</td>
+                <td>{{ player.number }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
