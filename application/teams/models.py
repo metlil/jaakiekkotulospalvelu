@@ -10,6 +10,8 @@ class Team(db.Model):
     name = db.Column(db.String(144), nullable=False)
     city = db.Column(db.String(144), nullable=False)
 
+    players = db.relationship("Player", backref='team', lazy=True)
+
     def __init__(self, name, city):
         self.name = name
         self.city = city
