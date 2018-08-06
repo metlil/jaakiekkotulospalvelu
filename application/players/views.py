@@ -26,7 +26,8 @@ def players_create():
 def players_index():
     return render_template("players/list.html", players=Player.query.all())
 
-@app.route("/players/<player_id>/", methods=["GET", "POST", "DELETE"])
+
+@app.route("/players/<player_id>/", methods=["GET", "POST"])
 def player_page(player_id):
     if request.method == 'POST':
         return players_modify(player_id)

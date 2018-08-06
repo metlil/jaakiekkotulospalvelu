@@ -1,18 +1,33 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <form method="POST" action="{{ url_for('team_page', team_id = team.id) }}">
-        <div>
-            Current name:
-            {{ team.name }}
-            and current city:
-            {{ team.city }}
-        </div>
-
-        New name:
-        <input type="text" name="name"/>
-        New city:
-        <input type="text" name="city"/>
-        <input type="submit" value="Update team"/>
+    <h3>Modify team</h3>
+    <form method="POST" action="{{ url_for('team_page', team_id = team_id) }}">
+        <table>
+            <tr>
+                <td>
+                    {{ form.name.label }}
+                </td>
+                <td>
+                    {{ form.name }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.city.label }}
+                </td>
+                <td>
+                    {{ form.city }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="Update team information"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <form method="POST" action="{{ url_for('team_delete', team_id = team_id) }}">
+        <input type="submit" value="Delete team"/>
     </form>
 {% endblock %}

@@ -2,10 +2,28 @@
 
 {% block body %}
     <form method="POST" action="{{ url_for('teams_create') }}">
-        Team name:
-        <input type="text" name="name"/>
-        City:
-        <input type="text" name="city"/>
-        <input type="submit" value="Add a new team"/>
+        <table>
+            <tr>
+                <td>
+                    {{ form.name.label }}
+                </td>
+                <td>
+                    {{ form.name }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.city.label }}
+                </td>
+                <td>
+                    {{ form.city }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="Add a new team"/>
+                </td>
+            </tr>
+        </table>
     </form>
 {% endblock %}
