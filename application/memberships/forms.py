@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, DateField, FieldList, FormField
+from wtforms import SelectField, DateField, HiddenField
 
 
 class MembershipForm(FlaskForm):
@@ -7,6 +7,8 @@ class MembershipForm(FlaskForm):
     team_id = SelectField("Team", coerce=int)
     membership_start = DateField("Membership start")
     membership_end = DateField("Membership end")
+    # With this we will know which membership this is
+    membership_id = HiddenField("Membership id")
 
     class Meta:
         csrf = False
