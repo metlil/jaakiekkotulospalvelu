@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for
 
 from application import app, db
+from application.memberships.models import Membership
 from application.players.forms import PlayerForm
 from application.players.models import Player
 from application.teams.models import Team
@@ -8,17 +9,22 @@ from application.teams.models import Team
 
 @app.route("/players/new/")
 def players_form():
-    form = PlayerForm()
-    form.team_id.choices = [(team.id, team.name) for team in Team.query.order_by('name')]
-    return render_template("players/new.html", form=form)
+    return render_template("players/new.html", form=PlayerForm())
 
 
 @app.route("/players/", methods=["POST"])
 def players_create():
     form = PlayerForm(request.form)
+    if 'add_membership' in set(request.form):
+        form.memberships.append_entry()
+        teams = Team.query.order_by('name')
+        for entry in form.memberships.entries:
+            entry.team_id.choices = [(team.id, team.name) for team in teams]
+        return render_template("players/new.html", form=form)
 
     p = Player(form.firstname.data, form.lastname.data, form.number.data)
-    p.team_id = form.team_id.data
+    for membership_data in form.memberships.data:
+        p.memberships.append(Membership(membership_data))
     db.session().add(p)
     db.session().commit()
 

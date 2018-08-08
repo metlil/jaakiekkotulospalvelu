@@ -27,17 +27,36 @@
                     {{ form.number }}
                 </td>
             </tr>
+            {% for membership in form.memberships %}
+                <tr>
+                    <td>
+                        {{ membership.membership_start.label }}
+                    </td>
+                    <td>
+                        {{ membership.membership_start }}
+                    </td>
+                    <td>
+                        {{ membership.team_id.label }}
+                    </td>
+                    <td>
+                        {{ membership.team_id }}
+                    </td>
+                    <td>
+                        {{ membership.membership_end.label }}
+                    </td>
+                    <td>
+                        {{ membership.membership_end }}
+                    </td>
+                </tr>
+            {% endfor %}
             <tr>
-                <td>
-                    {{ form.team_id.label }}
-                </td>
-                <td>
-                    {{ form.team_id }}
+                <td colspan="2">
+                    <input type="submit" name="add_membership" value="Add membership"/>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <input type="submit" value="Add a new player"/>
+                    <input type="submit" name="create_player" value="Add a new player"/>
                 </td>
             </tr>
         </table>

@@ -1,9 +1,9 @@
 from flask import redirect, render_template, request, url_for
+from flask_login import login_required
 
 from application import app, db
-from application.teams.models import Team
 from application.teams.forms import TeamForm
-from flask_login import login_required
+from application.teams.models import Team
 
 
 @app.route("/teams/", methods=["GET"])
@@ -15,6 +15,7 @@ def teams_index():
 @login_required
 def teams_form():
     return render_template("teams/new.html", form=TeamForm())
+
 
 @app.route("/teams/", methods=["POST"])
 @login_required
@@ -63,4 +64,3 @@ def team_delete(team_id):
     db.session().delete(team)
     db.session().commit()
     return redirect(url_for("teams_index"))
-
