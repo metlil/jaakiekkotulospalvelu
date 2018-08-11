@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <table>
+        <tr>
+            <th>Home Team</th>
+            <th>Guest Team</th>
+            <th>Time</th>
+            <th>Place</th>
+        </tr>
+        {% for game in games %}
+            <tr>
+                <td>
+                    {{ game.home_team.name}}
+                </td>
+                <td>{{ game.guest_team.name }}</td>
+                <td>{{ game.time }}</td>
+                <td>{{ game.place }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
