@@ -38,7 +38,7 @@ def teams_update_form(team_id):
     return render_template("teams/update.html", form=form, team_id=team_id)
 
 
-def teams_modify(team_id):
+def teams_save_modified_data(team_id):
     form = TeamForm(request.form)
     t = Team(form.name.data, form.city.data)
     t2 = Team.query.get(team_id)
@@ -53,7 +53,7 @@ def teams_modify(team_id):
 @login_required
 def team_page(team_id):
     if request.method == 'POST':
-        return teams_modify(team_id)
+        return teams_save_modified_data(team_id)
     else:
         return teams_update_form(team_id)
 

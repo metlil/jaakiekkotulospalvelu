@@ -39,7 +39,7 @@ def player_page(player_id):
         if 'add_membership' in set(request.form):
             form = create_player_form_with_appended_membership(request.form)
             return render_template("players/update.html", form=form, player_id=player_id)
-        return players_modify(player_id)
+        return players_save_modified_data(player_id)
     else:
         return players_show_update_form(player_id)
 
@@ -73,7 +73,7 @@ def players_show_update_form(player_id):
     return render_template("players/update.html", form=form, player_id=player_id)
 
 
-def players_modify(player_id):
+def players_save_modified_data(player_id):
     form = PlayerForm(request.form)
 
     p = Player.query.get(player_id)
