@@ -63,3 +63,10 @@ def game_page(game_id):
         return games_save_modified_data(game_id)
     else:
         return games_show_update_form(game_id)
+
+@app.route("/games/<game_id>/delete", methods=["POST"])
+def game_delete(game_id):
+    game = Game.query.get(game_id)
+    db.session().delete(game)
+    db.session().commit()
+    return redirect(url_for("games_index"))

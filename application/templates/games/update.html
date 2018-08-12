@@ -35,7 +35,7 @@
             </tr>
         </table>
     </form>
-    {#<form method="POST" action="{{ url_for('team_delete', team_id = team_id) }}">
-        <input type="submit" value="Delete team"/>
-    </form>#}
+    <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">
+        <input type="submit" value="Delete game"/>
+    </form>
 {% endblock %}
