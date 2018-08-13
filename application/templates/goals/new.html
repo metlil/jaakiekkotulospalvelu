@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <form method="POST" action="{{ url_for('goals_create') }}">
+        <table>
+            <tr>
+                <td>
+                    {{ form.player_id.label }}
+                </td>
+                <td>
+                    {{ form.player_id }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.game_id.label }}
+                </td>
+                <td>
+                    {{ form.game_id }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.time.label }}
+                </td>
+                <td>
+                    {{ form.time }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" name="create_goal" value="Add a new goal"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

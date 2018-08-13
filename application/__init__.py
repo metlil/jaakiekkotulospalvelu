@@ -35,6 +35,9 @@ from application.auth import views
 from application.game import models
 from application.game import views
 
+from application.goal import models
+from application.goal import views
+
 # kirjautuminen
 from application.auth.models import User
 from os import urandom

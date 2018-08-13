@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <h3>Modify goal</h3>
+    <form method="POST" action="{{ url_for('goal_page', goal_id = goal_id) }}">
+        <table>
+            <tr>
+                <td>
+                    {{ form.player_id.label }}
+                </td>
+                <td>
+                    {{ form.player_id }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.game_id.label }}
+                </td>
+                <td>
+                    {{ form.game_id }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.time.label }}
+                </td>
+                <td>
+                    {{ form.time }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="Update goal information"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <form method="POST" action="{{ url_for('goal_delete', goal_id = goal_id) }}">
+        <input type="submit" value="Delete goal"/>
+    </form>
+{% endblock %}

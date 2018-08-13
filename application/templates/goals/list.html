@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <table>
+        <tr>
+            <th>Player</th>
+            <th>Game</th>
+            <th>Time</th>
+        </tr>
+        {% for goal in goals %}
+            <tr>
+                <td>{{ goal.player.lastname}}</td>
+                <td>{{ goal.game.id }}</td>
+                <td>{{ goal.time }}</td>
+                <td><a href="{{ url_for('goal_page', goal_id = goal.id ) }}">Modify</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
