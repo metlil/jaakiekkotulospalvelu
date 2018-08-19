@@ -1,4 +1,5 @@
 # flask- sovellus
+
 from flask import Flask
 
 app = Flask(__name__)
@@ -65,3 +66,16 @@ try:
     db.create_all()
 except:
     pass
+
+import argparse
+from application.test_data import import_test_data
+
+
+@app.before_first_request
+def before_first_request():
+    # Should be after start up
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--import-data', action='store_true')
+    args = parser.parse_args()
+    if args.import_data:
+        import_test_data()
