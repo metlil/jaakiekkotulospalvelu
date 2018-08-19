@@ -28,11 +28,16 @@
                     {{ form.time }}
                 </td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    <input type="submit" value="Update game information"/>
-                </td>
-            </tr>
+            {% if game_status=='SCHEDULED' %}
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" name="update_game" value="Update game information"/>
+                    </td>
+                    <td colspan="2">
+                        <input type="submit" name="confirm_game" value="Confirm game information"/>
+                    </td>
+                </tr>
+            {% endif %}
         </table>
     </form>
     <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">

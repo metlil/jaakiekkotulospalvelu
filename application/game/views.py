@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for
 
 from application import app, db
 from application.game.forms import GameForm
+from application.game.game_status import GameStatus
 from application.game.models import Game
 from application.teams.models import Team
 
@@ -24,7 +25,7 @@ def games_form():
 def games_create():
     form = GameForm(request.form)
 
-    g = Game(form.home_id.data, form.guest_id.data, form.time.data, Team.query.get(form.home_id.data).city)
+    g = Game(form.home_id.data, form.guest_id.data, form.time.data, Team.query.get(form.home_id.data).city, GameStatus.SCHEDULED)
     db.session().add(g)
     db.session().commit()
 
@@ -32,16 +33,19 @@ def games_create():
 
 
 def games_save_modified_data(game_id):
-    form = GameForm(request.form)
     game = Game.query.get(game_id)
+    copy_form_data_to_game(game, request.form)
+    db.session().commit()
 
+    return redirect(url_for("games_index"))
+
+
+def copy_form_data_to_game(game, request_form):
+    form = GameForm(request_form)
     game.home_id = form.home_id.data
     game.guest_id = form.guest_id.data
     game.time = form.time.data
     game.place = Team.query.get(form.home_id.data).city
-    db.session().commit()
-
-    return redirect(url_for("games_index"))
 
 
 def games_show_update_form(game_id):
@@ -53,14 +57,31 @@ def games_show_update_form(game_id):
     form.home_id.data = game.home_id
     form.guest_id.data = game.guest_id
     form.time.data = game.time
+    if game.status == GameStatus.STARTING:
+        form.time.render_kw={'disabled': True}
+        form.home_id.render_kw={'disabled': True}
+        form.guest_id.render_kw={'disabled': True}
 
-    return render_template("games/update.html", form=form, game_id=game_id)
+    return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value)
+
+
+def confirm_game(game_id):
+    game = Game.query.get(game_id)
+    copy_form_data_to_game(game, request.form)
+    game.status = GameStatus.STARTING
+    db.session().commit()
+
+    return redirect(url_for("game_page", game_id=game_id))
 
 
 @app.route("/games/<game_id>/", methods=["GET", "POST"])
 def game_page(game_id):
     if request.method == 'POST':
-        return games_save_modified_data(game_id)
+        if 'update_game' in set(request.form):
+            return games_save_modified_data(game_id)
+        if 'confirm_game' in set(request.form):
+            return confirm_game(game_id)
+        #myy
     else:
         return games_show_update_form(game_id)
 

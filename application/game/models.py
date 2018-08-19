@@ -1,4 +1,7 @@
 from application import db
+from application.game import game_status
+from application.game.game_status import GameStatus
+
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,9 +18,11 @@ class Game(db.Model):
 
     time = db.Column(db.DateTime)
     place = db.Column(db.String, nullable=False)
+    status = db.Column(db.Enum(GameStatus), nullable=False)
 
-    def __init__(self, home_id, guest_id, time, place):
+    def __init__(self, home_id, guest_id, time, place, status: GameStatus):
         self.home_id = home_id
         self.guest_id = guest_id
         self.time = time
         self.place = place
+        self.status = status
