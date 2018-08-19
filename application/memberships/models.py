@@ -8,9 +8,10 @@ class Membership(db.Model):
                               onupdate=db.func.current_timestamp())
 
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    player = db.relationship('Player', back_populates='memberships')
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    membership_start = db.Column(db.DateTime)
-    membership_end = db.Column(db.DateTime)
+    membership_start = db.Column(db.Date)
+    membership_end = db.Column(db.Date)
 
     def __init__(self, player_id, team_id, membership_start, membership_end):
         self.player_id = player_id

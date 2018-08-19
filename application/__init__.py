@@ -29,6 +29,8 @@ from application.players import views
 
 from application.memberships import models
 
+from application.lineup import models
+
 from application.auth import models
 from application.auth import views
 

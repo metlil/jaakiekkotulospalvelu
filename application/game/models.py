@@ -1,5 +1,4 @@
 from application import db
-from application.game import game_status
 from application.game.game_status import GameStatus
 
 
@@ -9,11 +8,9 @@ class Game(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
                               onupdate=db.func.current_timestamp())
 
-    home_id = db.Column(db.Integer, db.ForeignKey('team.id'),
-        nullable=False)
+    home_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     home_team = db.relationship('Team', foreign_keys=[home_id])
-    guest_id = db.Column(db.Integer, db.ForeignKey('team.id'),
-        nullable=False)
+    guest_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     guest_team = db.relationship('Team', foreign_keys=[guest_id])
 
     time = db.Column(db.DateTime)

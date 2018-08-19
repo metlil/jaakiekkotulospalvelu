@@ -40,6 +40,34 @@
             {% endif %}
         </table>
     </form>
+    {% if game_status!='SCHEDULED' %}
+        <h3>Home team lineup</h3>
+        {% for lineup_entry in home_lineup_form.lineup_entries %}
+            <table>
+                <tr>
+                    <td>
+                        {{ lineup_entry.membership_id.label }}
+                    </td>
+                    <td>
+                        {{ lineup_entry.membership_id }}
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+        <h3>Guest team lineup</h3>
+        {% for lineup_entry in guest_lineup_form.lineup_entries %}
+            <table>
+                <tr>
+                    <td>
+                        {{ lineup_entry.membership_id.label }}
+                    </td>
+                    <td>
+                        {{ lineup_entry.membership_id }}
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
     <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">
         <input type="submit" value="Delete game"/>
     </form>

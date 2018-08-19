@@ -11,7 +11,7 @@ class Player(db.Model):
     lastname = db.Column(db.String(144), nullable=False)
     number = db.Column(db.Integer, nullable=False)
 
-    memberships = db.relationship("Membership", backref='player', lazy=True)
+    memberships = db.relationship("Membership", back_populates='player', lazy=True)
 
     def __init__(self, firstname, lastname, number):
         self.firstname = firstname
