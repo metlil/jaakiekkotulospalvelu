@@ -90,19 +90,23 @@ def populate_lineup_form(lineup_entries, memberships):
         lineup_form.lineup_entries.append_entry()
         lineup_entry_form = lineup_form.lineup_entries[-1]
         lineup_entry_form.membership_id.data = lineup_entry.membership_id
-        lineup_entry_form.membership_id.choices = [(y.id, y.player.firstname) for y in memberships]
+        lineup_entry_form.membership_id.choices = [format_membership_for_dropdown(y) for y in memberships]
         lineup_entry_form.membership_id.choices.append((-1, ''))
     # default
     while len(lineup_form.lineup_entries) < lineup_max:
         lineup_form.lineup_entries.append_entry()
         lineup_entry_form = lineup_form.lineup_entries[-1]
         lineup_entry_form.membership_id.choices = [(-1, '')]
-        lineup_entry_form.membership_id.choices.extend([(y.id, y.player.firstname) for y in memberships])
+        lineup_entry_form.membership_id.choices.extend([format_membership_for_dropdown(y) for y in memberships])
         selected_entry_ids = set([y.membership_id.data for y in lineup_form.lineup_entries])
         not_selected_entries = [x.id for x in memberships if x.id not in selected_entry_ids]
         if len(not_selected_entries) > 0:
             lineup_entry_form.membership_id.data = not_selected_entries[0]
     return lineup_form
+
+
+def format_membership_for_dropdown(membership: Membership):
+    return (membership.id, membership.player.firstname + " " + membership.player.lastname)
 
 
 def confirm_game(game_id):
