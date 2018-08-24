@@ -1,20 +1,24 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <table>
-        <tr>
-            <th>Player name</th>
-            <th>Player number</th>
-        </tr>
+    <a href="{{ url_for('players_form') }}">Add a player</a>
+    <div>
+        <div class="row">
+            <div class="col-2">Player name</div>
+            <div class="col-2">Player number</div>
+        </div>
+
         {% for player in players %}
-            <tr>
-                <td>
+            <div class="row">
+                <div class="col-2">
                     <a href="{{ url_for('player_page', player_id= player.id) }}">
                         {{ player.lastname }}, {{ player.firstname }}
                     </a>
-                </td>
-                <td>{{ player.number }}</td>
-            </tr>
+                </div>
+                <div class="col-2">
+                    {{ player.number }}
+                </div>
+            </div>
         {% endfor %}
-    </table>
+    </div>
 {% endblock %}
