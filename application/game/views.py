@@ -12,7 +12,7 @@ from application.teams.models import Team
 
 @app.route("/games/", methods=["GET"])
 def games_index():
-    return render_template("games/list.html", games=Game.query.all())
+    return render_template("games/list.html", games=Game.query.order_by(Game.time).all())
 
 
 @app.route("/games/new/")

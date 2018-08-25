@@ -1,7 +1,9 @@
-from datetime import date
+from datetime import date, datetime, timedelta, time
 
 from application import db
 from application.auth.models import User
+from application.game.game_status import GameStatus
+from application.game.models import Game
 from application.memberships.models import Membership
 from application.players.models import Player
 from application.teams.models import Team
@@ -22,12 +24,12 @@ def import_test_data():
     team_tappara = Team("Tappara", "Tampere")
     team_jyp = Team("JYP", "Jyväskylä")
     teams = [team_hifk, team_hpk, team_jyp, team_tps, team_ilves, team_tappara]
-    hifk_players = parse_players(get_raw_hifk_players(), team_hifk)
-    hpk_players = parse_players(get_raw_hpk_players(), team_hpk)
-    jyp_players = parse_players(get_raw_jyp_players(), team_jyp)
-    tps_players = parse_players(get_raw_tps_players(), team_tps)
-    ilves_players = parse_players(get_raw_ilves_players(), team_ilves)
-    tappara_players = parse_players(get_raw_tappara_players(), team_tappara)
+    hifk_players = parse_players(get_raw_hifk_players(), team_hifk, teams)
+    hpk_players = parse_players(get_raw_hpk_players(), team_hpk, teams)
+    jyp_players = parse_players(get_raw_jyp_players(), team_jyp, teams)
+    tps_players = parse_players(get_raw_tps_players(), team_tps, teams)
+    ilves_players = parse_players(get_raw_ilves_players(), team_ilves, teams)
+    tappara_players = parse_players(get_raw_tappara_players(), team_tappara, teams)
     add_objects_to_session(teams)
     add_objects_to_session(hifk_players)
     add_objects_to_session(hpk_players)
@@ -36,21 +38,67 @@ def import_test_data():
     add_objects_to_session(ilves_players)
     add_objects_to_session(tappara_players)
     db.session().commit()
+    games = generate_games(teams)
+    add_objects_to_session(games)
+    db.session().commit()
 
 
-def parse_players(raw_players, team):
+def generate_games(teams):
+    def generate_for_month(start_day):
+        def conflict_in_schedule(x: Game, home_team, guest_team, game_start):
+            if game_start != x.time:
+                return False
+            return guest_team.id in {x.home_id, x.guest_id} or home_team.id in {x.home_id, x.guest_id}
+
+        games = []
+        for home_team in teams:
+            for guest_team in [x for x in teams if x != home_team]:
+                for x in range(30):
+                    delta = timedelta(days=x)
+                    game_date = start_day + delta
+                    game_time = time(hour=18)
+                    game_start = datetime.combine(game_date, game_time)
+                    conflict_games = [x for x in games if conflict_in_schedule(x, home_team, guest_team, game_start)]
+                    if len(conflict_games) > 0:
+                        continue
+                    games.append(Game(home_team.id, guest_team.id, game_start, home_team.city, GameStatus.FINISHED))
+                    break
+        return games
+
+    start_days = [date(2018, 8, 1), date(2018, 9, 1), date(2018, 10, 1)]
+    return [game for x in start_days for game in generate_for_month(x)]
+
+
+def parse_players(raw_players, team, teams):
     players = []
     number = 1
+    other_teams = [x for x in teams if x != team]
     for raw_player in raw_players:
         values = raw_player.split(",")
-        print(raw_player, values)
         player = Player(values[1], values[0], number)
-        number += 1
-        membership = Membership({'membership_start': date(2018, 8, 1)})
-        player.memberships.append(membership)
-        team.memberships.append(membership)
+        if number > 2 * len(other_teams):
+            membership = Membership({'membership_start': date(2018, 8, 1)})
+            player.memberships.append(membership)
+            team.memberships.append(membership)
+        elif number > len(other_teams):
+            membership1 = Membership({'membership_start': date(2018, 8, 1), 'membership_end': date(2018, 8, 31)})
+            membership2 = Membership({'membership_start': date(2018, 9, 1)})
+            player.memberships.append(membership1)
+            player.memberships.append(membership2)
+            other_teams[number % len(other_teams)].memberships.append(membership1)
+            team.memberships.append(membership2)
+        else:
+            membership1 = Membership({'membership_start': date(2018, 8, 1), 'membership_end': date(2018, 8, 31)})
+            membership2 = Membership({'membership_start': date(2018, 9, 1), 'membership_end': date(2018, 9, 30)})
+            membership3 = Membership({'membership_start': date(2018, 10, 1)})
+            player.memberships.append(membership1)
+            player.memberships.append(membership2)
+            player.memberships.append(membership3)
+            other_teams[number % len(other_teams)].memberships.append(membership1)
+            other_teams[(number + 1) % len(other_teams)].memberships.append(membership2)
+            team.memberships.append(membership3)
         players.append(player)
-        print(player.firstname, player.lastname, player.number)
+        number += 1
     return players
 
 

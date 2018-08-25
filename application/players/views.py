@@ -61,7 +61,7 @@ def players_show_update_form(player_id):
     form.lastname.data = player.lastname
     form.number.data = player.number
     teams = Team.query.order_by('name')
-    for membership in player.memberships:
+    for membership in sorted(player.memberships, key=lambda Membership: Membership.membership_start):
         form.memberships.append_entry()
         membership_form = form.memberships[-1]
         membership_form.membership_id.data = membership.id
