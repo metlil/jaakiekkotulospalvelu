@@ -1,73 +1,84 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <h3>Modify game</h3>
-    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
-        <table>
-            <tr>
-                <td>
-                    {{ form.home_id.label }}
-                </td>
-                <td>
-                    {{ form.home_id }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    {{ form.guest_id.label }}
-                </td>
-                <td>
-                    {{ form.guest_id }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    {{ form.time.label }}
-                </td>
-                <td>
-                    {{ form.time }}
-                </td>
-            </tr>
-            {% if game_status=='SCHEDULED' %}
-                <tr>
-                    <td colspan="2">
-                        <input type="submit" name="update_game" value="Update game information"/>
-                    </td>
-                    <td colspan="2">
-                        <input type="submit" name="confirm_game" value="Confirm game information"/>
-                    </td>
-                </tr>
-            {% endif %}
-        </table>
-    </form>
-    {% if game_status!='SCHEDULED' %}
-        <h3>Home team lineup</h3>
-        {% for lineup_entry in home_lineup_form.lineup_entries %}
-            <table>
-                <tr>
-                    <td>
-                        {{ lineup_entry.membership_id.label }}
-                    </td>
-                    <td>
-                        {{ lineup_entry.membership_id }}
-                    </td>
-                </tr>
-            </table>
-        {% endfor %}
-        <h3>Guest team lineup</h3>
-        {% for lineup_entry in guest_lineup_form.lineup_entries %}
-            <table>
-                <tr>
-                    <td>
-                        {{ lineup_entry.membership_id.label }}
-                    </td>
-                    <td>
-                        {{ lineup_entry.membership_id }}
-                    </td>
-                </tr>
-            </table>
-        {% endfor %}
-    {% endif %}
+    <div class="row">
+        <div class="col-4">
+            <h3>Modify game</h3>
+            <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.home_id.label }}
+                    </div>
+                    <div class="col-6">
+                        {{ form.home_id }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.guest_id.label }}
+                    </div>
+                    <div class="col-6">
+                        {{ form.guest_id }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.time.label }}
+                    </div>
+                    <div class="col-6">
+                        {{ form.time }}
+                    </div>
+                </div>
+                {% if game_status=='SCHEDULED' %}
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="submit" name="update_game" value="Update game information"/>
+                        </div>
+                        <div class="col-6">
+                            <input type="submit" name="confirm_game" value="Confirm game information"/>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+        {% if game_status!='SCHEDULED' %}
+            <div class="col-8">
+                <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>Home team lineup</h3>
+                            {% for lineup_entry in game_lineup_form.home_lineup.lineup_entries %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        {{ lineup_entry.membership_id.label }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ lineup_entry.membership_id }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            <h3>Guest team lineup</h3>
+                            {% for lineup_entry in game_lineup_form.guest_lineup.lineup_entries %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        {{ lineup_entry.membership_id.label }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ lineup_entry.membership_id }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <input type="submit" name="update_lineup" value="Update game lineup"/>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    </div>
     <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">
         <input type="submit" value="Delete game"/>
     </form>

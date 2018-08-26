@@ -37,8 +37,10 @@ def players_index():
 def player_page(player_id):
     if request.method == 'POST':
         if 'add_membership' in set(request.form):
+            # Add membership button was pressed
             form = create_player_form_with_appended_membership(request.form)
             return render_template("players/update.html", form=form, player_id=player_id)
+        # Update player information button was pressed
         return players_save_modified_data(player_id)
     else:
         return players_show_update_form(player_id)
@@ -60,6 +62,7 @@ def players_show_update_form(player_id):
     form.firstname.data = player.firstname
     form.lastname.data = player.lastname
     form.number.data = player.number
+
     teams = Team.query.order_by('name')
     for membership in sorted(player.memberships, key=lambda Membership: Membership.membership_start):
         form.memberships.append_entry()
@@ -80,6 +83,7 @@ def players_save_modified_data(player_id):
     p.firstname = form.firstname.data
     p.lastname = form.lastname.data
     p.number = form.number.data
+
     for membership_data in form.memberships.data:
         if membership_data['membership_id'] == '':
             p.memberships.append(Membership(membership_data))

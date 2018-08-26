@@ -1,13 +1,18 @@
+import datetime
+
 from flask import render_template, request, redirect, url_for
 
 from application import app, db
 from application.game.forms import GameForm
 from application.game.game_status import GameStatus
 from application.game.models import Game
-from application.lineup.forms import LineupForm
+from application.lineup.forms import GameLineupForm
 from application.lineup.models import LineupEntry
 from application.memberships.models import Membership
 from application.teams.models import Team
+
+lineup_min = 3
+lineup_max = 3
 
 
 @app.route("/games/", methods=["GET"])
@@ -52,7 +57,7 @@ def copy_form_data_to_game(game, request_form):
     game.place = Team.query.get(form.home_id.data).city
 
 
-def games_show_update_form(game_id):
+def games_show_update_form(game_id, error=''):
     game = Game.query.get(game_id)
     form = GameForm()
     teams = Team.query.order_by('name')
@@ -71,38 +76,36 @@ def games_show_update_form(game_id):
         lineup_entries = LineupEntry.query.filter(LineupEntry.game_id == game_id).all()
         home_lineup_entries = [x for x in lineup_entries if x.membership_id in set([y.id for y in home_memberships])]
         guest_lineup_entries = [x for x in lineup_entries if x.membership_id in set([y.id for y in guest_memberships])]
-        home_lineup_form = populate_lineup_form(home_lineup_entries, home_memberships)
-        guest_lineup_form = populate_lineup_form(guest_lineup_entries, guest_memberships)
+        game_lineup_form = GameLineupForm()
+        populate_lineup_form(home_lineup_entries, home_memberships, game_lineup_form.home_lineup, game.time)
+        populate_lineup_form(guest_lineup_entries, guest_memberships, game_lineup_form.guest_lineup, game.time)
         return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value,
-                               home_lineup_form=home_lineup_form, guest_lineup_form=guest_lineup_form)
+                               game_lineup_form=game_lineup_form, error=error)
 
-    return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value)
+    return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value, error=error)
 
 
-def populate_lineup_form(lineup_entries, memberships):
+def populate_lineup_form(lineup_entries, memberships, lineup_form, start_time):
     # TODO check membership validity period
-    lineup_min = 3
-    lineup_max = 3
-    lineup_form = LineupForm()
     for lineup_entry in lineup_entries:
         if len(lineup_form.lineup_entries) == lineup_max:
             break
         lineup_form.lineup_entries.append_entry()
         lineup_entry_form = lineup_form.lineup_entries[-1]
         lineup_entry_form.membership_id.data = lineup_entry.membership_id
-        lineup_entry_form.membership_id.choices = [format_membership_for_dropdown(y) for y in memberships]
-        lineup_entry_form.membership_id.choices.append((-1, ''))
     # default
     while len(lineup_form.lineup_entries) < lineup_max:
         lineup_form.lineup_entries.append_entry()
         lineup_entry_form = lineup_form.lineup_entries[-1]
-        lineup_entry_form.membership_id.choices = [(-1, '')]
-        lineup_entry_form.membership_id.choices.extend([format_membership_for_dropdown(y) for y in memberships])
         selected_entry_ids = set([y.membership_id.data for y in lineup_form.lineup_entries])
         not_selected_entries = [x.id for x in memberships if x.id not in selected_entry_ids]
         if len(not_selected_entries) > 0:
             lineup_entry_form.membership_id.data = not_selected_entries[0]
-    return lineup_form
+    for lineup_entry_form in lineup_form.lineup_entries.entries:
+        lineup_entry_form.membership_id.choices = [(-1, '')]
+        lineup_entry_form.membership_id.choices.extend(
+            [format_membership_for_dropdown(y) for y in memberships if is_member_during_game(y, start_time)]
+        )
 
 
 def format_membership_for_dropdown(membership: Membership):
@@ -118,6 +121,48 @@ def confirm_game(game_id):
     return redirect(url_for("game_page", game_id=game_id))
 
 
+def validate_game_lineup_form(game_lineup_form):
+    def lineup_valid(lineup):
+        return len(lineup) == len(set(lineup)) and lineup_min <= len(lineup) <= lineup_max
+
+    home_membership_ids = [x.membership_id.data for x in game_lineup_form.home_lineup.lineup_entries.entries]
+    guest_membership_ids = [x.membership_id.data for x in game_lineup_form.guest_lineup.lineup_entries.entries]
+    # Remove empty values
+    home_membership_ids = [x for x in home_membership_ids if x != -1]
+    guest_membership_ids = [x for x in guest_membership_ids if x != -1]
+    # Should be unique
+    return lineup_valid(home_membership_ids) and lineup_valid(guest_membership_ids)
+
+
+def save_modified_game_lineup(game_id):
+    game_lineup_form = GameLineupForm(request.form)
+    valid = validate_game_lineup_form(game_lineup_form)
+    if not valid:
+        return games_show_update_form(game_id, error='Lineup is not valid. Lineup contains atleast '
+                                                     + str(lineup_min) + ' and atmost ' + str(lineup_max) + ' entries.')
+    game = Game.query.get(game_id)
+    form_membership_ids = []
+    form_membership_ids.extend([x.membership_id.data for x in game_lineup_form.home_lineup.lineup_entries.entries])
+    form_membership_ids.extend([x.membership_id.data for x in game_lineup_form.guest_lineup.lineup_entries.entries])
+    # Remove empty values
+    form_membership_ids = set([x for x in form_membership_ids if x != -1])
+
+    new_lineup = []
+    deleted_lineup = []
+    for lineup_entry in game.lineup:
+        if lineup_entry.membership_id in form_membership_ids:
+            new_lineup.append(lineup_entry)
+        else:
+            deleted_lineup.append(lineup_entry)
+    new_membership_ids = set([x.membership_id for x in new_lineup])
+    new_lineup.extend([LineupEntry(game_id, x) for x in form_membership_ids if x not in new_membership_ids])
+    game.lineup = new_lineup
+    for deleted_lineup_entry in deleted_lineup:
+        db.session().delete(deleted_lineup_entry)
+    db.session().commit()
+    return games_show_update_form(game_id)
+
+
 @app.route("/games/<game_id>/", methods=["GET", "POST"])
 def game_page(game_id):
     if request.method == 'POST':
@@ -125,6 +170,8 @@ def game_page(game_id):
             return games_save_modified_data(game_id)
         if 'confirm_game' in set(request.form):
             return confirm_game(game_id)
+        if 'update_lineup' in set(request.form):
+            return save_modified_game_lineup(game_id)
         # myy
     else:
         return games_show_update_form(game_id)
@@ -136,3 +183,11 @@ def game_delete(game_id):
     db.session().delete(game)
     db.session().commit()
     return redirect(url_for("games_index"))
+
+
+def is_member_during_game(x: Membership, game_start: datetime):
+    if game_start.date() < x.membership_start:
+        return False
+    if x.membership_end is None:
+        return True
+    return game_start.date() < x.membership_end

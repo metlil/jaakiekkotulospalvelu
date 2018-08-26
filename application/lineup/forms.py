@@ -14,3 +14,11 @@ class LineupForm(FlaskForm):
 
     class Meta:
         csrf = False
+
+
+class GameLineupForm(FlaskForm):
+    home_lineup = FormField(LineupForm)
+    guest_lineup = FormField(LineupForm)
+
+    class Meta:
+        csrf = False
