@@ -7,9 +7,8 @@ class Goal(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
                               onupdate=db.func.current_timestamp())
 
-    player_id = db.Column(db.Integer, db.ForeignKey('player.id'),
-                          nullable=False)
-    player = db.relationship('Player', foreign_keys=[player_id])
+    scorer_id = db.Column(db.Integer, db.ForeignKey('lineup_entry.id'), nullable=False)
+    scorer = db.relationship('LineupEntry', foreign_keys=[scorer_id])
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     game = db.relationship('Game', foreign_keys=[game_id])
     time = db.Column(db.Time)
