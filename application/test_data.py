@@ -4,6 +4,7 @@ from application import db
 from application.auth.models import User
 from application.game.game_status import GameStatus
 from application.game.models import Game
+from application.lineup.models import LineupEntry
 from application.memberships.models import Membership
 from application.players.models import Player
 from application.teams.models import Team
@@ -43,6 +44,27 @@ def import_test_data():
     db.session().commit()
 
 
+def is_member_during_game(x: Membership, game_start):
+    if game_start.date() < x.membership_start:
+        return False
+    if x.membership_end is None:
+        return True
+    return game_start.date() < x.membership_end
+
+
+def membership_to_lineup(x: Membership, game: Game):
+    return LineupEntry(game.id, x.id)
+
+
+def create_game(game_start, home_team, guest_team, result):
+    game = Game(home_team.id, guest_team.id, game_start, home_team.city, GameStatus.FINISHED)
+    home_memberships = [x for x in home_team.memberships if is_member_during_game(x, game_start)][:20]
+    guest_memberships = [x for x in guest_team.memberships if is_member_during_game(x, game_start)][:20]
+    game.lineup.extend([membership_to_lineup(x, game) for x in home_memberships])
+    game.lineup.extend([membership_to_lineup(x, game) for x in guest_memberships])
+    return game
+
+
 def generate_games(teams):
     def generate_for_month(start_day):
         def conflict_in_schedule(x: Game, home_team, guest_team, game_start):
@@ -51,17 +73,18 @@ def generate_games(teams):
             return guest_team.id in {x.home_id, x.guest_id} or home_team.id in {x.home_id, x.guest_id}
 
         games = []
+        result = 1
         for home_team in teams:
             for guest_team in [x for x in teams if x != home_team]:
                 for x in range(30):
-                    delta = timedelta(days=x)
-                    game_date = start_day + delta
+                    game_date = start_day + timedelta(days=x)
                     game_time = time(hour=18)
                     game_start = datetime.combine(game_date, game_time)
                     conflict_games = [x for x in games if conflict_in_schedule(x, home_team, guest_team, game_start)]
                     if len(conflict_games) > 0:
                         continue
-                    games.append(Game(home_team.id, guest_team.id, game_start, home_team.city, GameStatus.FINISHED))
+                    games.append(create_game(game_start, home_team, guest_team, result))
+                    result += 1
                     break
         return games
 

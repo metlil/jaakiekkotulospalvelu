@@ -8,6 +8,7 @@ class LineupEntry(db.Model):
                               onupdate=db.func.current_timestamp())
 
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
+    game = db.relationship('Game', back_populates='lineup')
 
     membership_id = db.Column(db.Integer, db.ForeignKey('membership.id'), nullable=False)
     membership = db.relationship('Membership', foreign_keys=[membership_id])
