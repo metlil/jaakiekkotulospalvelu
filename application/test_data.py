@@ -4,6 +4,7 @@ from application import db
 from application.auth.models import User
 from application.game.game_status import GameStatus
 from application.game.models import Game
+from application.goal.models import Goal
 from application.lineup.models import LineupEntry
 from application.memberships.models import Membership
 from application.players.models import Player
@@ -60,8 +61,29 @@ def create_game(game_start, home_team, guest_team, result):
     game = Game(home_team.id, guest_team.id, game_start, home_team.city, GameStatus.FINISHED)
     home_memberships = [x for x in home_team.memberships if is_member_during_game(x, game_start)][:20]
     guest_memberships = [x for x in guest_team.memberships if is_member_during_game(x, game_start)][:20]
-    game.lineup.extend([membership_to_lineup(x, game) for x in home_memberships])
-    game.lineup.extend([membership_to_lineup(x, game) for x in guest_memberships])
+    home_lineup = [membership_to_lineup(x, game) for x in home_memberships]
+    game.lineup.extend(home_lineup)
+    guest_lineup = [membership_to_lineup(x, game) for x in guest_memberships]
+    game.lineup.extend(guest_lineup)
+
+    for i in range(0, 3):
+        goal_time = time(0, i * 10 + 17, 33)
+        scorer = home_lineup[i]
+        goal = Goal(scorer.id, game.id, goal_time)
+        goal.scorer = scorer
+        game.goals.append(goal)
+    for i in range(0, 3):
+        goal_time = time(0, i * 10 + 15, 19)
+        scorer = guest_lineup[i]
+        goal = Goal(scorer.id, game.id, goal_time)
+        goal.scorer = scorer
+        game.goals.append(goal)
+    scorer =  guest_lineup[0]
+    if result % 2 == 1:
+        scorer = home_lineup[0]
+    goal = Goal(scorer.id, game.id, time(0, 59, 6))
+    goal.scorer = scorer
+    game.goals.append(goal)
     return game
 
 

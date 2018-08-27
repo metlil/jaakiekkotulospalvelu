@@ -17,6 +17,7 @@ class Game(db.Model):
     place = db.Column(db.String, nullable=False)
     status = db.Column(db.Enum(GameStatus), nullable=False)
     lineup = db.relationship("LineupEntry", back_populates='game', lazy=True)
+    goals = db.relationship("Goal", back_populates='game', lazy=True)
 
     def __init__(self, home_id, guest_id, time, place, status: GameStatus):
         self.home_id = home_id
