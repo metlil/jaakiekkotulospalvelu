@@ -2,23 +2,22 @@
 
 {% block body %}
     <a href="{{ url_for('games_form') }}">Add a game</a>
-    <table>
-        <tr>
-            <th>Home Team</th>
-            <th>Guest Team</th>
-            <th>Time</th>
-            <th>Place</th>
-        </tr>
+    <div>
+        <div class="row">
+            <div class="col-2"><b>Home Team</b></div>
+            <div class="col-2"><b>Guest Team</b></div>
+            <div class="col-2"><b>Time</b></div>
+            <div class="col-2"><b>Place</b></div>
+        </div>
+
         {% for game in games %}
-            <tr>
-                <td>
-                    {{ game.home_team.name }}
-                </td>
-                <td>{{ game.guest_team.name }}</td>
-                <td>{{ game.time }}</td>
-                <td>{{ game.place }}</td>
-                <td><a href="{{ url_for('game_page', game_id = game.id ) }}">Modify</a></td>
-            </tr>
+            <div class="row">
+                <div class="col-2">{{ game.home_team.name }}</div>
+                <div class="col-2">{{ game.guest_team.name }}</div>
+                <div class="col-2">{{ game.time }}</div>
+                <div class="col-2">{{ game.place }}</div>
+                <div class="col-2"><a href="{{ url_for('game_page', game_id = game.id ) }}">Modify</a></div>
+            </div>
         {% endfor %}
-    </table>
+    </div>
 {% endblock %}
