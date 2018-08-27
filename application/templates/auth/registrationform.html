@@ -2,6 +2,7 @@
 
 {% block body %}
     <form method="POST" action="{{ url_for('auth_register') }}">
+    <h3>Create new account</h3>
         <table>
             <tr>
                 <td>
@@ -27,9 +28,14 @@
                     {{ form.password }}
                 </td>
             </tr>
-            <tr>
+            {#<tr>
                 <td colspan="2">
                     <input type="submit" value="Register"/>
+                </td>
+            </tr>#}
+            <tr>
+                <td colspan="2">
+                    <input class="btn btn-lg btn-primary btn-block" type="submit" value="Register"/>
                 </td>
             </tr>
         </table>

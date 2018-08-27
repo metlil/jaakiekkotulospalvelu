@@ -1,27 +1,20 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <form method="POST" action="{{ url_for('auth_login') }}">
+    <form method="POST" class="form-signin" action="{{ url_for('auth_login') }}">
+    <h3>Login to your account</h3>
         <table>
             <tr>
-                <td>
-                    {{ form.username.label }}
-                </td>
-                <td>
-                    {{ form.username }}
-                </td>
+                <td>{{ form.username.label }}</td>
+                <td>{{ form.username }}</td>
             </tr>
             <tr>
-                <td>
-                    {{ form.password.label }}
-                </td>
-                <td>
-                    {{ form.password }}
-                </td>
+                <td>{{ form.password.label }}</td>
+                <td>{{ form.password }}</td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <input type="submit" value="Login"/>
+                    <input class="btn btn-lg btn-primary btn-block" type="submit" value="Login"/>
                 </td>
             </tr>
         </table>
