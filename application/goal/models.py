@@ -13,7 +13,7 @@ class Goal(db.Model):
     game = db.relationship('Game', foreign_keys=[game_id])
     time = db.Column(db.Time)
 
-    def __init__(self, player_id, game_id, time):
-        self.player_id = player_id
+    def __init__(self, scorer_id, game_id, time):
+        self.scorer_id = scorer_id
         self.game_id = game_id
         self.time = time
