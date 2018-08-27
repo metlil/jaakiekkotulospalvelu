@@ -72,9 +72,11 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="row">
-                        <input type="submit" name="update_lineup" value="Update game lineup"/>
-                    </div>
+                    {% if game_status == 'STARTING' %}
+                        <div class="row">
+                            <input type="submit" name="confirm_lineup" value="Confirm game lineup"/>
+                        </div>
+                    {% endif %}
                 </form>
             </div>
         {% endif %}
