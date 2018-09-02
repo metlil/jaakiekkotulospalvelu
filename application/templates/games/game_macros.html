@@ -1,0 +1,47 @@
+{% macro lineup(lineup_entries) %}
+    {% for lineup_entry in lineup_entries %}
+        <div class="row">
+            <div class="col-6">
+                {{ lineup_entry.membership_id.label }}
+            </div>
+            <div class="col-6">
+                {{ lineup_entry.membership_id }}
+            </div>
+        </div>
+    {% endfor %}
+{%- endmacro %}
+
+{% macro goal_form(game_id, goal_form) %}
+    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+        <div class="row">
+            <div class="col-2">
+                {{ goal_form.scorer_id.label }}
+            </div>
+            <div class="col-2">
+                {{ goal_form.scorer_id }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                {{ goal_form.time.label }}
+            </div>
+            <div class="col-2">
+                {{ goal_form.time }}
+            </div>
+            <div>
+                {{ goal_form.team_id }}
+            </div>
+        </div>
+        <input type="submit" name="add_goal" value="Add goal"/>
+    </form>
+{%- endmacro %}
+
+{% macro goals(goals) %}
+    <ul>
+        {% for goal in goals %}
+            <li>
+                {{ goal.lastname }}, {{ goal.firstname }}, {{ goal.number }}, {{ goal.time }}
+            </li>
+        {% endfor %}
+    </ul>
+{%- endmacro %}

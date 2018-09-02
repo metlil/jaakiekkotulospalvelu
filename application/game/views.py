@@ -42,7 +42,42 @@ def games_create():
     db.session().add(g)
     db.session().commit()
 
+    return redirect(url_for("game_page", game_id=g.id))
+
+
+@app.route("/games/<game_id>/", methods=["GET", "POST"])
+def game_page(game_id):
+    if request.method == 'POST':
+        if 'update_game' in set(request.form):
+            return games_save_modified_data(game_id)
+        if 'confirm_game' in set(request.form):
+            return confirm_game(game_id)
+        if 'confirm_lineup' in set(request.form):
+            return save_modified_game_lineup(game_id)
+        if 'add_goal' in set(request.form):
+            return goals_create(game_id)
+        # if 'finish_game' in set(request.form):
+        #     return finish_game(game_id)
+    else:
+        return games_show_update_form(game_id)
+
+
+@app.route("/games/<game_id>/delete", methods=["POST"])
+def game_delete(game_id):
+    game = Game.query.get(game_id)
+    db.session().delete(game)
+    db.session().commit()
     return redirect(url_for("games_index"))
+
+
+@app.route("/games/<game_id>/finish", methods=["POST"])
+def finish_game(game_id):
+    game = Game.query.get(game_id)
+    # copy_form_data_to_game(game, request.form)
+    game.status = GameStatus.FINISHED
+    db.session().commit()
+
+    return redirect(url_for("game_page", game_id=game_id))
 
 
 def games_save_modified_data(game_id):
@@ -50,7 +85,7 @@ def games_save_modified_data(game_id):
     copy_form_data_to_game(game, request.form)
     db.session().commit()
 
-    return redirect(url_for("games_index"))
+    return redirect(url_for("game_page", game_id=game_id))
 
 
 def copy_form_data_to_game(game, request_form):
@@ -93,11 +128,18 @@ def games_show_update_form(game_id, error=''):
         guest_goals_form.team_id.data = game.guest_id
         guest_goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in
                                               guest_lineup_entries]
-        return render_page("games/update.html", form=form, game_id=game_id, game_status=game.status.value,
-                           game_lineup_form=game_lineup_form, error=error,
-                           home_team_goals=Goal.team_goals(game.home_id, game_id),
-                           guest_team_goals=Goal.team_goals(game.guest_id, game_id),
-                           home_goals_form=home_goals_form, guest_goals_form=guest_goals_form)
+        return render_page(
+            "games/update.html",
+            form=form,
+            game_id=game_id,
+            game_status=game.status.value,
+            game_lineup_form=game_lineup_form,
+            home_team_goals=Goal.team_goals(game.home_id, game_id),
+            guest_team_goals=Goal.team_goals(game.guest_id, game_id),
+            home_goals_form=home_goals_form,
+            guest_goals_form=guest_goals_form,
+            error=error
+        )
 
     return render_page("games/update.html", form=form, game_id=game_id, game_status=game.status.value, error=error)
 
@@ -188,31 +230,6 @@ def save_modified_game_lineup(game_id):
     return games_show_update_form(game_id)
 
 
-@app.route("/games/<game_id>/", methods=["GET", "POST"])
-def game_page(game_id):
-    if request.method == 'POST':
-        if 'update_game' in set(request.form):
-            return games_save_modified_data(game_id)
-        if 'confirm_game' in set(request.form):
-            return confirm_game(game_id)
-        if 'confirm_lineup' in set(request.form):
-            return save_modified_game_lineup(game_id)
-        if 'add_goal' in set(request.form):
-            return goals_create(game_id)
-        # if 'finish_game' in set(request.form):
-        #     return finish_game(game_id)
-    else:
-        return games_show_update_form(game_id)
-
-
-@app.route("/games/<game_id>/delete", methods=["POST"])
-def game_delete(game_id):
-    game = Game.query.get(game_id)
-    db.session().delete(game)
-    db.session().commit()
-    return redirect(url_for("games_index"))
-
-
 def is_member_during_game(x: Membership, game_start: datetime):
     if game_start.date() < x.membership_start:
         return False
@@ -230,17 +247,6 @@ def goals_create(game_id):
         return games_show_update_form(game_id, error=str(e))
     goal = Goal(form.scorer_id.data, game_id, start_time, form.team_id.data)
     db.session().add(goal)
-    db.session().commit()
-
-    return redirect(url_for("game_page", game_id=game_id))
-
-
-@app.route("/games/<game_id>/finish", methods=["POST"])
-def finish_game(game_id):
-    game = Game.query.get(game_id)
-    # copy_form_data_to_game(game, request.form)
-    game.status = GameStatus.FINISHED
-    print("pupup ", game.status.value)
     db.session().commit()
 
     return redirect(url_for("game_page", game_id=game_id))

@@ -1,37 +1,16 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <form method="POST" action="{{ url_for('games_create') }}">
-        <table>
-            <tr>
-                <td>
-                    {{ form.home_id.label }}
-                </td>
-                <td>
-                    {{ form.home_id }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    {{ form.guest_id.label }}
-                </td>
-                <td>
-                    {{ form.guest_id }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    {{ form.time.label }}
-                </td>
-                <td>
-                    {{ form.time }}
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <input type="submit" name="create_game" value="Add a new game"/>
-                </td>
-            </tr>
-        </table>
-    </form>
+    <div class="row">
+        <div class="col-4">
+            <form method="POST" action="{{ url_for('games_create') }}">
+                {% include 'games/game_basic_information.html' %}
+                <div class="row">
+                    <div class="col-6">
+                        <input type="submit" name="create_game" value="Add a new game"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
