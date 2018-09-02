@@ -1,8 +1,8 @@
-from flask import render_template
+from application import app, get_render_page_function
 
-from application import app
+render_page = get_render_page_function('index')
 
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_page("index.html")

@@ -1,6 +1,6 @@
 # flask- sovellus
 
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
@@ -18,6 +18,15 @@ else:
 
 # Luodaan db-olio, jota käytetään tietokannan käsittelyyn
 db = SQLAlchemy(app)
+
+
+def get_render_page_function(state):
+    def render_page(template, **kwargs):
+        kwargs['state'] = state
+        return render_template(template, **kwargs)
+
+    return render_page
+
 
 # oman sovelluksen toiminnalisuudet
 from application import views

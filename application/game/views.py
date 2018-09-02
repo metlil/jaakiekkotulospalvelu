@@ -1,8 +1,8 @@
 import datetime
 
-from flask import render_template, request, redirect, url_for
+from flask import request, redirect, url_for
 
-from application import app, db
+from application import app, db, get_render_page_function
 from application.game.forms import GameForm
 from application.game.game_status import GameStatus
 from application.game.models import Game
@@ -16,11 +16,12 @@ from application.teams.models import Team
 
 lineup_min = 3
 lineup_max = 3
+render_page = get_render_page_function('games')
 
 
 @app.route("/games/", methods=["GET"])
 def games_index():
-    return render_template("games/list.html", games=Game.query.order_by(Game.time).all())
+    return render_page("games/list.html", games=Game.query.order_by(Game.time).all())
 
 
 @app.route("/games/new/")
@@ -29,7 +30,7 @@ def games_form():
     teams = Team.query.order_by('name')
     form.home_id.choices = [(team.id, team.name) for team in teams]
     form.guest_id.choices = [(team.id, team.name) for team in teams]
-    return render_template("games/new.html", form=form)
+    return render_page("games/new.html", form=form)
 
 
 @app.route("/games/", methods=["POST"])
@@ -92,13 +93,13 @@ def games_show_update_form(game_id, error=''):
         guest_goals_form.team_id.data = game.guest_id
         guest_goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in
                                               guest_lineup_entries]
-        return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value,
-                               game_lineup_form=game_lineup_form, error=error,
-                               home_team_goals=Goal.team_goals(game.home_id, game_id),
-                               guest_team_goals=Goal.team_goals(game.guest_id, game_id),
-                               home_goals_form=home_goals_form, guest_goals_form=guest_goals_form)
+        return render_page("games/update.html", form=form, game_id=game_id, game_status=game.status.value,
+                           game_lineup_form=game_lineup_form, error=error,
+                           home_team_goals=Goal.team_goals(game.home_id, game_id),
+                           guest_team_goals=Goal.team_goals(game.guest_id, game_id),
+                           home_goals_form=home_goals_form, guest_goals_form=guest_goals_form)
 
-    return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value, error=error)
+    return render_page("games/update.html", form=form, game_id=game_id, game_status=game.status.value, error=error)
 
 
 def populate_lineup_form(lineup_entries, memberships, lineup_form, start_time, game_status):

@@ -18,20 +18,29 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <li class="nav-item">
+                <a class="nav-link {% if state == 'index' %}active{% endif %}"
+                   href="{{ url_for('index') }}">
+                    Home <span class="sr-only">(current)</span>
+                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('teams_index') }}">Teams</a>
+                <a class="nav-link {% if state == 'teams' %}active{% endif %}"
+                   href="{{ url_for('teams_index') }}">
+                    Teams
+                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('players_index') }}">Players</a>
+                <a class="nav-link {% if state == 'players' %}active{% endif %}"
+                   href="{{ url_for('players_index') }}">
+                    Players
+                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('games_index') }}">Games</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
+                <a class="nav-link {% if state == 'games' %}active{% endif %}"
+                   href="{{ url_for('games_index') }}">
+                    Games
+                </a>
             </li>
         </ul>
         <div class="form-inline mt-2 mt-md-0">
@@ -56,9 +65,6 @@
 
 <main role="main" class="container">
     {% block body %}
-        <p>
-            Content.
-        </p>
     {% endblock %}
 </main>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"

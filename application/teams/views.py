@@ -1,20 +1,22 @@
-from flask import redirect, render_template, request, url_for
+from flask import redirect, request, url_for
 from flask_login import login_required
 
-from application import app, db
+from application import app, db, get_render_page_function
 from application.teams.forms import TeamForm
 from application.teams.models import Team
+
+render_page = get_render_page_function('teams')
 
 
 @app.route("/teams/", methods=["GET"])
 def teams_index():
-    return render_template("teams/list.html", teams=Team.query.all())
+    return render_page("teams/list.html", teams=Team.query.all())
 
 
 @app.route("/teams/new/")
 @login_required
 def teams_form():
-    return render_template("teams/new.html", form=TeamForm())
+    return render_page("teams/new.html", form=TeamForm())
 
 
 @app.route("/teams/", methods=["POST"])
@@ -35,8 +37,8 @@ def teams_update_form(team_id):
     form = TeamForm()
     form.name.data = team.name
     form.city.data = team.city
-    return render_template("teams/update.html", form=form, team_id=team_id,
-                           current_members=Team.find_current_players(team_id))
+    return render_page("teams/update.html", form=form, team_id=team_id,
+                       current_members=Team.find_current_players(team_id))
 
 
 def teams_save_modified_data(team_id):

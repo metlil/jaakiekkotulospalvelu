@@ -1,22 +1,24 @@
-from flask import render_template, request, redirect, url_for
+from flask import request, redirect, url_for
 
-from application import app, db
+from application import app, db, get_render_page_function
 from application.memberships.models import Membership
 from application.players.forms import PlayerForm
 from application.players.models import Player
 from application.teams.models import Team
 
+render_page = get_render_page_function('players')
+
 
 @app.route("/players/new/")
 def players_form():
-    return render_template("players/new.html", form=PlayerForm())
+    return render_page("players/new.html", form=PlayerForm())
 
 
 @app.route("/players/", methods=["POST"])
 def players_create():
     if 'add_membership' in set(request.form):
         form = create_player_form_with_appended_membership(request.form)
-        return render_template("players/new.html", form=form)
+        return render_page("players/new.html", form=form)
     form = PlayerForm(request.form)
 
     p = Player(form.firstname.data, form.lastname.data, form.number.data)
@@ -24,13 +26,12 @@ def players_create():
         p.memberships.append(Membership(membership_data))
     db.session().add(p)
     db.session().commit()
-
-    return redirect(url_for("players_index"))
+    return redirect(url_for("player_page", player_id=p.id))
 
 
 @app.route("/players/", methods=["GET"])
 def players_index():
-    return render_template("players/list.html", players=Player.query.all())
+    return render_page("players/list.html", players=Player.query.all())
 
 
 @app.route("/players/<player_id>/", methods=["GET", "POST"])
@@ -39,7 +40,7 @@ def player_page(player_id):
         if 'add_membership' in set(request.form):
             # Add membership button was pressed
             form = create_player_form_with_appended_membership(request.form)
-            return render_template("players/update.html", form=form, player_id=player_id)
+            return render_page("players/update.html", form=form, player_id=player_id)
         # Update player information button was pressed
         return players_save_modified_data(player_id)
     else:
@@ -73,7 +74,7 @@ def players_show_update_form(player_id):
         membership_form.player_id.data = player_id
         membership_form.membership_start.data = membership.membership_start
         membership_form.membership_end.data = membership.membership_end
-    return render_template("players/update.html", form=form, player_id=player_id)
+    return render_page("players/update.html", form=form, player_id=player_id)
 
 
 def players_save_modified_data(player_id):
@@ -98,7 +99,7 @@ def players_save_modified_data(player_id):
 
     db.session().commit()
 
-    return redirect(url_for("players_index"))
+    return redirect(url_for("player_page", player_id=player_id))
 
 
 def create_player_form_with_appended_membership(request_form):
