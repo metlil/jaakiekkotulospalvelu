@@ -1,29 +1,16 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <form method="POST" action="{{ url_for('teams_create') }}">
-        <table>
-            <tr>
-                <td>
-                    {{ form.name.label }}
-                </td>
-                <td>
-                    {{ form.name }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    {{ form.city.label }}
-                </td>
-                <td>
-                    {{ form.city }}
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <input type="submit" value="Add a new team"/>
-                </td>
-            </tr>
-        </table>
-    </form>
+    <div class="row">
+        <form method="POST" action="{{ url_for('teams_create') }}">
+            <div class="col-4">
+                {% include 'teams/team.html' %}
+                <div class="row">
+                    <div class="col-4">
+                        <input type="submit" value="Add a new team"/>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}

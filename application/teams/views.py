@@ -29,6 +29,23 @@ def teams_create():
     db.session().add(t)
     db.session().commit()
 
+    return redirect(url_for("team_page", team_id=t.id))
+
+
+@app.route("/teams/<team_id>/", methods=["GET", "POST"])
+@login_required
+def team_page(team_id):
+    if request.method == 'POST':
+        return teams_save_modified_data(team_id)
+    else:
+        return teams_update_form(team_id)
+
+
+@app.route("/teams/<team_id>/delete", methods=["POST"])
+def team_delete(team_id):
+    team = Team.query.get(team_id)
+    db.session().delete(team)
+    db.session().commit()
     return redirect(url_for("teams_index"))
 
 
@@ -49,21 +66,4 @@ def teams_save_modified_data(team_id):
     t2.city = t.city
     db.session().commit()
 
-    return redirect(url_for("teams_index"))
-
-
-@app.route("/teams/<team_id>/", methods=["GET", "POST"])
-@login_required
-def team_page(team_id):
-    if request.method == 'POST':
-        return teams_save_modified_data(team_id)
-    else:
-        return teams_update_form(team_id)
-
-
-@app.route("/teams/<team_id>/delete", methods=["POST"])
-def team_delete(team_id):
-    team = Team.query.get(team_id)
-    db.session().delete(team)
-    db.session().commit()
-    return redirect(url_for("teams_index"))
+    return redirect(url_for("team_page", team_id=team_id))

@@ -1,35 +1,13 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <h3>Modify player</h3>
+    <div class="row">
+        <h3>Player</h3>
+    </div>
     <form method="POST" action="{{ url_for('player_page', player_id = player_id) }}">
         <div class="row">
             <div class="col-4">
-                <h3>Basic information</h3>
-                <div class="row">
-                    <div class="col-6">
-                        {{ form.firstname.label }}
-                    </div>
-                    <div class="col-6">
-                        {{ form.firstname(size=15) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        {{ form.lastname.label }}
-                    </div>
-                    <div class="col-6">
-                        {{ form.lastname(size=15) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        {{ form.number.label }}
-                    </div>
-                    <div class="col-6">
-                        {{ form.number(size=15) }}
-                    </div>
-                </div>
+                {% include 'players/player_basic_info.html' %}
                 <div class="row">
                     <div class="col-6">
                         <input type="submit" name="update_player" value="Update player information"/>
@@ -37,41 +15,14 @@
                 </div>
             </div>
             <div class="col-8">
-                <h3>Memberships</h3>
-                {% for membership in form.memberships %}
-                    <div class="row">
-                        <div class="col-1">
-                            {{ membership.team_id.label }}
-                        </div>
-                        <div class="col-2">
-                            {{ membership.team_id }}
-                        </div>
-                        <div class="col-2">
-                            {{ membership.membership_start.label }}
-                        </div>
-                        <div class="col-2">
-                            {{ membership.membership_start(size=8) }}
-                        </div>
-                        <div class="col-2">
-                            {{ membership.membership_end.label }}
-                        </div>
-                        <div class="col-2">
-                            {{ membership.membership_end(size=8) }}
-                        </div>
-                        <div>
-                            {{ membership.membership_id }}
-                        </div>
-                    </div>
-                {% endfor %}
-                <div class="row">
-                    <input type="submit" name="add_membership" value="Add membership"/>
-                </div>
+                {% include 'players/player_memberships.html' %}
             </div>
         </div>
     </form>
-    <form method="POST" action="{{ url_for('player_delete', player_id = player_id) }}">
-        <input type="submit" value="Delete player"/>
-        <p>Delete carefully</p>
-    </form>
-
+    <div class="row">
+        <form method="POST" action="{{ url_for('player_delete', player_id = player_id) }}">
+            <input type="submit" value="Delete player"/>
+            <p>Delete carefully</p>
+        </form>
+    </div>
 {% endblock %}

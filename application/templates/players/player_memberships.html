@@ -1,0 +1,29 @@
+<h3>Memberships</h3>
+{% for membership in form.memberships %}
+    <div class="row">
+        <div class="col-1">
+            {{ membership.team_id.label }}
+        </div>
+        <div class="col-2">
+            {{ membership.team_id }}
+        </div>
+        <div class="col-2">
+            {{ membership.membership_start.label }}
+        </div>
+        <div class="col-2">
+            {{ membership.membership_start(size=8) }}
+        </div>
+        <div class="col-2">
+            {{ membership.membership_end.label }}
+        </div>
+        <div class="col-2">
+            {{ membership.membership_end(size=8) }}
+        </div>
+        <div>
+            {{ membership.membership_id }}
+        </div>
+    </div>
+{% endfor %}
+<div class="row">
+    <input type="submit" name="add_membership" value="Add membership"/>
+</div>
