@@ -16,7 +16,7 @@ class Goal(db.Model):
     scorer = db.relationship('LineupEntry', foreign_keys=[scorer_id])
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     game = db.relationship('Game', foreign_keys=[game_id])
-    time = db.Column(db.Time)
+    time = db.Column(db.Time, nullable=False)
 
     def __init__(self, scorer_id, game_id, time, team_id):
         self.scorer_id = scorer_id
