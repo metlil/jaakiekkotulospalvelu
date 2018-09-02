@@ -30,4 +30,17 @@
     <form method="POST" action="{{ url_for('team_delete', team_id = team_id) }}">
         <input type="submit" value="Delete team"/>
     </form>
+
+    {% if current_members is defined %}
+        <h3>Players</h3>
+
+        <ul>
+            {% for player in current_members %}
+                <li>
+                    {{ player.lastname }}, {{ player.firstname }} {{ player.number }}
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
 {% endblock %}

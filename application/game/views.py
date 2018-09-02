@@ -6,6 +6,9 @@ from application import app, db
 from application.game.forms import GameForm
 from application.game.game_status import GameStatus
 from application.game.models import Game
+from application.goal.forms import GoalForm
+from application.goal.models import Goal
+from application.goal.views import parse_time_from_view
 from application.lineup.forms import GameLineupForm
 from application.lineup.models import LineupEntry
 from application.memberships.models import Membership
@@ -81,8 +84,19 @@ def games_show_update_form(game_id, error=''):
                              game.status)
         populate_lineup_form(guest_lineup_entries, guest_memberships, game_lineup_form.guest_lineup, game.time,
                              game.status)
+        home_goals_form = GoalForm()
+        home_goals_form.team_id.data = game.home_id
+        home_goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in
+                                             home_lineup_entries]
+        guest_goals_form = GoalForm()
+        guest_goals_form.team_id.data = game.guest_id
+        guest_goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in
+                                              guest_lineup_entries]
         return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value,
-                               game_lineup_form=game_lineup_form, error=error)
+                               game_lineup_form=game_lineup_form, error=error,
+                               home_team_goals=Goal.team_goals(game.home_id, game_id),
+                               guest_team_goals=Goal.team_goals(game.guest_id, game_id),
+                               home_goals_form=home_goals_form, guest_goals_form=guest_goals_form)
 
     return render_template("games/update.html", form=form, game_id=game_id, game_status=game.status.value, error=error)
 
@@ -115,6 +129,10 @@ def populate_lineup_form(lineup_entries, memberships, lineup_form, start_time, g
 
 def format_membership_for_dropdown(membership: Membership):
     return (membership.id, membership.player.firstname + " " + membership.player.lastname)
+
+
+def format_lineup_entry_for_dropdown(lineup_entry: LineupEntry):
+    return (lineup_entry.id, lineup_entry.membership.player.firstname + " " + lineup_entry.membership.player.lastname)
 
 
 def confirm_game(game_id):
@@ -178,7 +196,10 @@ def game_page(game_id):
             return confirm_game(game_id)
         if 'confirm_lineup' in set(request.form):
             return save_modified_game_lineup(game_id)
-        # myy
+        if 'add_goal' in set(request.form):
+            return goals_create(game_id)
+        # if 'finish_game' in set(request.form):
+        #     return finish_game(game_id)
     else:
         return games_show_update_form(game_id)
 
@@ -197,3 +218,28 @@ def is_member_during_game(x: Membership, game_start: datetime):
     if x.membership_end is None:
         return True
     return game_start.date() < x.membership_end
+
+
+# maalilogiikkaa
+def goals_create(game_id):
+    form = GoalForm(request.form)
+    try:
+        start_time = parse_time_from_view(form.time.data)
+    except Exception as e:
+        return games_show_update_form(game_id, error=str(e))
+    goal = Goal(form.scorer_id.data, game_id, start_time, form.team_id.data)
+    db.session().add(goal)
+    db.session().commit()
+
+    return redirect(url_for("game_page", game_id=game_id))
+
+
+@app.route("/games/<game_id>/finish", methods=["POST"])
+def finish_game(game_id):
+    game = Game.query.get(game_id)
+    # copy_form_data_to_game(game, request.form)
+    game.status = GameStatus.FINISHED
+    print("pupup ", game.status.value)
+    db.session().commit()
+
+    return redirect(url_for("game_page", game_id=game_id))

@@ -9,7 +9,7 @@
         </tr>
         {% for goal in goals %}
             <tr>
-                <td>{{ goal.player.lastname }}</td>
+                <td>{{ goal.scorer.membership.player.lastname }}</td>
                 <td>{{ goal.game.id }}</td>
                 <td>{{ goal.time }}</td>
                 <td><a href="{{ url_for('goal_page', goal_id = goal.id ) }}">Modify</a></td>

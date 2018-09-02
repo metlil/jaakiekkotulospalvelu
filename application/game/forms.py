@@ -8,6 +8,8 @@ class GameForm(FlaskForm):
     time = DateField("Game Start")
     place = StringField("Place")
 
+    finish = SubmitField("Finish")
+
     delete = SubmitField("Delete")
 
     class Meta():

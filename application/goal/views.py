@@ -96,11 +96,6 @@ def parse_time_from_view(view_time):
     return time(hour=int(minutes / 60), minute=minutes % 60, second=seconds)
 
 
-def format_time_for_view(game_time: time):
-    minutes = 60 * game_time.hour + game_time.minute
-    return str(minutes) + ":" + str(game_time.second)
-
-
 def populate_goal_form(form):
     players = Player.query.order_by('lastname')
     games = Game.query.all()

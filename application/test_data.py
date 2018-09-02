@@ -70,18 +70,23 @@ def create_game(game_start, home_team, guest_team, result):
         goal_time = time(0, i * 10 + 17, 33)
         scorer = home_lineup[i]
         goal = Goal(scorer.id, game.id, goal_time)
+        goal.team_id = home_team.id
         goal.scorer = scorer
         game.goals.append(goal)
     for i in range(0, 3):
         goal_time = time(0, i * 10 + 15, 19)
         scorer = guest_lineup[i]
         goal = Goal(scorer.id, game.id, goal_time)
+        goal.team_id = guest_team.id
         goal.scorer = scorer
         game.goals.append(goal)
-    scorer =  guest_lineup[0]
+    scorer = guest_lineup[0]
+    team_id = guest_team.id
     if result % 2 == 1:
         scorer = home_lineup[0]
+        team_id = home_team.id
     goal = Goal(scorer.id, game.id, time(0, 59, 6))
+    goal.team_id = team_id
     goal.scorer = scorer
     game.goals.append(goal)
     return game

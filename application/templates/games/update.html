@@ -84,4 +84,86 @@
     <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">
         <input type="submit" value="Delete game"/>
     </form>
+
+    <div class="row">
+        {% if home_team_goals is defined %}
+            <div class="col-6">
+                <h3>Home team goals</h3>
+                {% if game_status == 'ONGOING' %}
+                    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+                        <div class="row">
+
+                            <div class="col-2">
+                                {{ home_goals_form.scorer_id.label }}
+                            </div>
+                            <div class="col-2">
+                                {{ home_goals_form.scorer_id }}
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-2">
+                                {{ home_goals_form.time.label }}
+                            </div>
+                            <div class="col-2">
+                                {{ home_goals_form.time }}
+                            </div>
+                            <div>
+                                {{ home_goals_form.team_id }}
+                            </div>
+                        </div>
+                        <input type="submit" name="add_goal" value="Add goal"/>
+                    </form>
+                {% endif %}
+                <ul>
+                    {% for goal in home_team_goals %}
+                        <li>
+                            {{ goal.lastname }}, {{ goal.firstname }}, {{ goal.number }}, {{ goal.time }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if guest_team_goals is defined %}
+            <div class="col-6">
+                <h3>Guest team goals</h3>
+                {% if game_status == 'ONGOING' %}
+                    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+                        <div class="row">
+
+                            <div class="col-2">
+                                {{ guest_goals_form.scorer_id.label }}
+                            </div>
+                            <div class="col-2">
+                                {{ guest_goals_form.scorer_id }}
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-2">
+                                {{ guest_goals_form.time.label }}
+                            </div>
+                            <div class="col-2">
+                                {{ guest_goals_form.time }}
+                            </div>
+                            <div>
+                                {{ guest_goals_form.team_id }}
+                            </div>
+                        </div>
+                        <input type="submit" name="add_goal" value="Add goal"/>
+                    </form>
+                {% endif %}
+                <ul>
+                    {% for goal in guest_team_goals %}
+                        <li>
+                            {{ goal.lastname }}, {{ goal.firstname }}, {{ goal.number }}, {{ goal.time }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    <form method="POST" action="{{ url_for('finish_game', game_id = game_id) }}">
+        <input type="submit" value="Finish game"/>
+    </form>
 {% endblock %}
