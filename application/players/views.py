@@ -1,4 +1,5 @@
 from flask import request, redirect, url_for
+from flask_login import login_required
 
 from application import app, db, get_render_page_function
 from application.memberships.models import Membership
@@ -10,11 +11,13 @@ render_page = get_render_page_function('players')
 
 
 @app.route("/players/new/")
+@login_required
 def players_form():
     return render_page("players/new.html", form=PlayerForm())
 
 
 @app.route("/players/", methods=["POST"])
+@login_required
 def players_create():
     if 'add_membership' in set(request.form):
         form = create_player_form_with_appended_membership(request.form)

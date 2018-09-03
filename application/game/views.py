@@ -1,6 +1,7 @@
 import datetime
 
 from flask import request, redirect, url_for
+from flask_login import login_required
 
 from application import app, db, get_render_page_function
 from application.game.forms import GameForm
@@ -25,6 +26,7 @@ def games_index():
 
 
 @app.route("/games/new/")
+@login_required
 def games_form():
     form = GameForm()
     teams = Team.query.order_by('name')
@@ -34,6 +36,7 @@ def games_form():
 
 
 @app.route("/games/", methods=["POST"])
+@login_required
 def games_create():
     form = GameForm(request.form)
 

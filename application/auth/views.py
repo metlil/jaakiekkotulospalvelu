@@ -1,5 +1,5 @@
-from flask import render_template, request, redirect, url_for
-from flask_login import login_user, logout_user
+from flask import request, url_for, redirect, render_template
+from flask.ext.login import login_user, logout_user
 
 from application import app, db
 from application.auth.forms import LoginForm
@@ -20,7 +20,7 @@ def auth_login():
                                error="No such username or password")
 
     login_user(user)
-    return redirect(url_for("index"))
+    return redirect(request.args.get("next") or url_for("index"))
 
 
 @app.route("/auth/logout")

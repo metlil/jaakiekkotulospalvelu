@@ -13,7 +13,7 @@ class Game(db.Model):
     guest_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     guest_team = db.relationship('Team', foreign_keys=[guest_id])
 
-    time = db.Column(db.DateTime,  nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
     place = db.Column(db.String, nullable=False)
     status = db.Column(db.Enum(GameStatus), nullable=False)
     lineup = db.relationship("LineupEntry", back_populates='game', lazy=True)

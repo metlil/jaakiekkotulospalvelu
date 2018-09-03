@@ -33,7 +33,6 @@ def teams_create():
 
 
 @app.route("/teams/<team_id>/", methods=["GET", "POST"])
-@login_required
 def team_page(team_id):
     if request.method == 'POST':
         return teams_save_modified_data(team_id)

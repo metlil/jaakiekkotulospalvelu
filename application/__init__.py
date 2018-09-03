@@ -1,6 +1,6 @@
 # flask- sovellus
 
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, request
 
 app = Flask(__name__)
 
@@ -87,3 +87,8 @@ def before_first_request():
     args = parser.parse_args()
     if args.import_data:
         import_test_data()
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect('/auth/login?next=' + request.path)
