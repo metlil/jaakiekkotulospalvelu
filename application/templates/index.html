@@ -1,7 +1,66 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <p>
+    <h1>
         Tervetuloa jääkiekkotulospalveluun!
-    </p>
+    </h1>
+
+    <h2>Sarjataulukko</h2>
+    {% if standings is defined %}
+        <table>
+            <col width="80">
+            <col width="80">
+            <col width="80">
+            <col width="80">
+            <col width="80">
+            <col width="130">
+            <col width="130">
+            <col width="80">
+            <col width="80">
+            <thead>
+            <tr>
+                <td>Joukkue</td>
+                <td>Ottelut</td>
+                <td>Voitot</td>
+                <td>Tappiot</td>
+                <td>Tasapelit</td>
+                <td>Tehdyt maalit</td>
+                <td>Päästetyt maalit</td>
+                <td>Maaliero</td>
+                <td>Pisteet</td>
+            </tr>
+            </thead>
+            {% for standing in standings %}
+                <tr>
+                    <td>
+                        {{ standing.name }}
+                    </td>
+                    <td>
+                        {{ standing.game_count }}
+                    </td>
+                    <td>
+                        {{ standing.win }}
+                    </td>
+                    <td>
+                        {{ standing.loss }}
+                    </td>
+                    <td>
+                        {{ standing.tie }}
+                    </td>
+                    <td>
+                        {{ standing.goals_for }}
+                    </td>
+                    <td>
+                        {{ standing.goals_against }}
+                    </td>
+                    <td>
+                        {{ standing.goal_difference }}
+                    </td>
+                    <td>
+                        {{ standing.points }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 {% endblock %}
