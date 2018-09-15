@@ -1,28 +1,58 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <div class="row">
-        <h3>Player</h3>
-    </div>
-    <form method="POST" action="{{ url_for('player_page', player_id = player_id) }}">
+    {% if current_user.is_authenticated %}
         <div class="row">
-            <div class="col-4">
-                {% include 'players/player_basic_info.html' %}
-                <div class="row">
-                    <div class="col-6">
-                        <input type="submit" name="update_player" value="Update player information"/>
+            <h3>Player</h3>
+        </div>
+        <form method="POST" action="{{ url_for('player_page', player_id = player_id) }}">
+            <div class="row">
+                <div class="col-4">
+                    {% include 'players/player_basic_info.html' %}
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="submit" name="update_player" value="Update player information"/>
+                        </div>
                     </div>
                 </div>
+                <div class="col-8">
+                    {% include 'players/player_memberships.html' %}
+                </div>
             </div>
-            <div class="col-8">
-                {% include 'players/player_memberships.html' %}
+        </form>
+    {% else %}
+        <div class="row">
+            <div class="col-2">
+                <h3>Player</h3>
+                <div class="row">
+                    Name: {{ player.firstname }} {{ player.lastname }}
+                </div>
+                <div class="row">
+                    Number: {{ player.number }}
+                </div>
+            </div>
+            <div class="col-10">
+                <h3>Memberships</h3>
+                <div class="row">
+                    {% for membership in player.memberships %}
+                        <div class="col-4">
+                            Team: {{ membership.team.name }}
+                        </div>
+                        <div class="col-8">
+                            During: {{ membership.membership_start }} -
+                            {% if membership.membership_end %}{{ membership.membership_end }} {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </form>
-    <div class="row">
-        <form method="POST" action="{{ url_for('player_delete', player_id = player_id) }}">
-            <input type="submit" value="Delete player"/>
-            <p>Delete carefully</p>
-        </form>
-    </div>
+    {% endif %}
+    {% if current_user.is_authenticated %}
+        <div class="row">
+            <form method="POST" action="{{ url_for('player_delete', player_id = player_id) }}">
+                <input type="submit" value="Delete player"/>
+                <p>Delete carefully</p>
+            </form>
+        </div>
+    {% endif %}
 {% endblock %}

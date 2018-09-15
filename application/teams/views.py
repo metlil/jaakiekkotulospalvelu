@@ -53,7 +53,10 @@ def teams_update_form(team_id):
     form = TeamForm()
     form.name.data = team.name
     form.city.data = team.city
-    return render_page("teams/update.html", form=form, team_id=team_id,
+    return render_page("teams/update.html",
+                       form=form,
+                       team=team,
+                       team_id=team_id,
                        current_members=Team.find_current_players(team_id))
 
 

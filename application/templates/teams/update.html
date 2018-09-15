@@ -5,16 +5,27 @@
         <h3>Team</h3>
     </div>
     <div class="row">
-        <form method="POST" action="{{ url_for('team_page', team_id = team_id) }}">
-            <div class="col-4">
-                {% include 'teams/team.html' %}
-                <div class="row">
-                    <div class="col-4">
-                        <input type="submit" value="Update team information"/>
+        {% if current_user.is_authenticated %}
+            <form method="POST" action="{{ url_for('team_page', team_id = team_id) }}">
+                <div class="col-4">
+                    {% include 'teams/team.html' %}
+                    <div class="row">
+                        <div class="col-4">
+                            <input type="submit" value="Update team information"/>
+                        </div>
                     </div>
                 </div>
+            </form>
+        {% else %}
+            <div class="col-8">
+                <div class="row">
+                    Team name: {{ team.name }}
+                </div>
+                <div class="row">
+                    City: {{ team.city }}
+                </div>
             </div>
-        </form>
+        {% endif %}
     </div>
     <div class="row">
         <div class="col-4">
@@ -30,11 +41,13 @@
             {% endif %}
         </div>
     </div>
-    <div class="row">
-        <div class="col-4">
-            <form method="POST" action="{{ url_for('team_delete', team_id = team_id) }}">
-                <input type="submit" value="Delete team"/>
-            </form>
+    {% if current_user.is_authenticated %}
+        <div class="row">
+            <div class="col-4">
+                <form method="POST" action="{{ url_for('team_delete', team_id = team_id) }}">
+                    <input type="submit" value="Delete team"/>
+                </form>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

@@ -135,16 +135,18 @@ def games_show_update_form(game_id, error=''):
             "games/update.html",
             form=form,
             game_id=game_id,
-            game_status=game.status.value,
+            game=game,
             game_lineup_form=game_lineup_form,
             home_team_goals=Goal.team_goals(game.home_id, game_id),
             guest_team_goals=Goal.team_goals(game.guest_id, game_id),
             home_goals_form=home_goals_form,
             guest_goals_form=guest_goals_form,
-            error=error
+            error=error,
+            home_team_players=Game.team_lineup(game_id, game.home_id),
+            guest_team_players=Game.team_lineup(game_id, game.guest_id)
         )
 
-    return render_page("games/update.html", form=form, game_id=game_id, game_status=game.status.value, error=error)
+    return render_page("games/update.html", form=form, game_id=game_id, game=game, error=error)
 
 
 def populate_lineup_form(lineup_entries, memberships, lineup_form, start_time, game_status):

@@ -10,6 +10,7 @@ class Membership(db.Model):
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     player = db.relationship('Player', back_populates='memberships')
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
+    team = db.relationship('Team', back_populates='memberships')
     membership_start = db.Column(db.Date, nullable=False)
     membership_end = db.Column(db.Date)
 

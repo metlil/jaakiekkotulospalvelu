@@ -4,38 +4,90 @@
 {% block body %}
     <div class="row">
         <div class="col-4">
-            <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
-                {% include 'games/game_basic_information.html' %}
-                {% if game_status=='SCHEDULED' %}
-                    <div class="row">
-                        <div class="col-6">
-                            <input type="submit" name="update_game" value="Update game information"/>
-                        </div>
-                        <div class="col-6">
-                            <input type="submit" name="confirm_game" value="Confirm game information"/>
-                        </div>
-                    </div>
-                {% endif %}
-            </form>
-        </div>
-        {% if game_status!='SCHEDULED' %}
-            <div class="col-8">
+            {% if current_user.is_authenticated %}
                 <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+                    {% include 'games/game_basic_information.html' %}
+                    {% if game.status.value=='SCHEDULED' %}
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="submit" name="update_game" value="Update game information"/>
+                            </div>
+                            <div class="col-6">
+                                <input type="submit" name="confirm_game" value="Confirm game information"/>
+                            </div>
+                        </div>
+                    {% endif %}
+                </form>
+            {% else %}
+                <h3>Game info</h3>
+                <div class="col-5">
+                    <div class="row">
+                        {{ game.home_team.name }} - {{ game.guest_team.name }}
+                    </div>
+                    <div class="row">
+                        Place: {{ game.place }}
+                    </div>
+                    <div class="row">
+                        Time: {{ game.time }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if game.status.value!='SCHEDULED' %}
+            <div class="col-8">
+                {% if current_user.is_authenticated %}
+                    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
                     <div class="row">
                         <div class="col-6">
-                            <h3>Home team lineup</h3>
+                            <h3>{{ game.home_team.name }} lineup</h3>
                             {{ lineup(game_lineup_form.home_lineup.lineup_entries) }}
                         </div>
                         <div class="col-6">
-                            <h3>Guest team lineup</h3>
+                            <h3>{{ game.guest_team.name }} lineup</h3>
                             {{ lineup(game_lineup_form.guest_lineup.lineup_entries) }}
                         </div>
                     </div>
-                    {% if game_status == 'STARTING' %}
+                    {% if game.status.value == 'STARTING' %}
                         <div class="row">
                             <input type="submit" name="confirm_lineup" value="Confirm game lineup"/>
                         </div>
                     {% endif %}
+                {% else %}
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>{{ game.home_team.name }} lineup</h3>
+                            {% if game.status.value == 'STARTING' %}
+                                No confirmed home team lineup
+                            {% else %}
+                                {% if home_team_players is defined %}
+                                    <ul>
+                                        {% for player in home_team_players %}
+                                            <li>
+                                                {{ player.firstname }} {{ player.lastname }}, {{ player.number }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <h3>{{ game.guest_team.name }} lineup</h3>
+                            {% if game.status.value == 'STARTING' %}
+                                No confirmed home team lineup
+                            {% else %}
+                                {% if guest_team_players is defined %}
+                                    <ul>
+                                        {% for player in guest_team_players %}
+                                            <li>
+                                                {{ player.firstname }} {{ player.lastname }}, {{ player.number }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
                 </form>
             </div>
         {% endif %}
@@ -44,8 +96,8 @@
     <div class="row">
         {% if home_team_goals is defined %}
             <div class="col-6">
-                <h3>Home team goals</h3>
-                {% if game_status == 'ONGOING' %}
+                <h3>{{ game.home_team.name }} goals</h3>
+                {% if game.status.value == 'ONGOING' and current_user.is_authenticated %}
                     {{ goal_form(game_id, home_goals_form) }}
                 {% endif %}
                 {{ goals(home_team_goals) }}
@@ -53,20 +105,22 @@
         {% endif %}
         {% if guest_team_goals is defined %}
             <div class="col-6">
-                <h3>Guest team goals</h3>
-                {% if game_status == 'ONGOING' %}
+                <h3>{{ game.guest_team.name }} goals</h3>
+                {% if game.status.value == 'ONGOING' and current_user.is_authenticated %}
                     {{ goal_form(game_id, guest_goals_form) }}
                 {% endif %}
                 {{ goals(guest_team_goals) }}
             </div>
         {% endif %}
     </div>
-    {% if game_status == 'ONGOING' %}
-        <form method="POST" action="{{ url_for('finish_game', game_id = game_id) }}">
-            <input type="submit" value="Finish game"/>
+    {% if current_user.is_authenticated %}
+        {% if game.status.value == 'ONGOING' %}
+            <form method="POST" action="{{ url_for('finish_game', game_id = game_id) }}">
+                <input type="submit" value="Finish game"/>
+            </form>
+        {% endif %}
+        <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">
+            <input type="submit" value="Delete game"/>
         </form>
     {% endif %}
-    <form method="POST" action="{{ url_for('game_delete', game_id = game_id) }}">
-        <input type="submit" value="Delete game"/>
-    </form>
 {% endblock %}

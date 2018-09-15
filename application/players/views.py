@@ -77,7 +77,7 @@ def players_show_update_form(player_id):
         membership_form.player_id.data = player_id
         membership_form.membership_start.data = membership.membership_start
         membership_form.membership_end.data = membership.membership_end
-    return render_page("players/update.html", form=form, player_id=player_id)
+    return render_page("players/update.html", form=form, player_id=player_id, player=player)
 
 
 def players_save_modified_data(player_id):

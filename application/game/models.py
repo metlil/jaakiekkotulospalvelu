@@ -1,3 +1,5 @@
+from sqlalchemy.sql import text
+
 from application import db
 from application.game.game_status import GameStatus
 
@@ -25,3 +27,20 @@ class Game(db.Model):
         self.time = time
         self.place = place
         self.status = status
+
+    @staticmethod
+    def team_lineup(game_id, team_id):
+        stmt = text("SELECT Player.lastname, Player.firstname, Player.number "
+                    "FROM Player, Lineup_Entry, Membership "
+                    "WHERE Lineup_Entry.game_id = :game_id "
+                    "AND Lineup_Entry.membership_id = Membership.id "
+                    "AND Membership.team_id = :team_id "
+                    "AND Membership.player_id = Player.id").params(game_id=game_id, team_id=team_id)
+
+        res = db.engine.execute(stmt)
+        response = []
+        for row in res:
+            response.append(
+                {"lastname": row[0], "firstname": row[1], "number": row[2]})
+
+        return response
