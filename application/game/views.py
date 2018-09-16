@@ -9,7 +9,6 @@ from application.game.game_status import GameStatus
 from application.game.models import Game
 from application.goal.forms import GoalForm
 from application.goal.models import Goal
-from application.goal.views import parse_time_from_view
 from application.lineup.forms import GameLineupForm
 from application.lineup.models import LineupEntry
 from application.memberships.models import Membership
@@ -40,8 +39,8 @@ def games_form():
 def games_create():
     form = GameForm(request.form)
 
-    g = Game(form.home_id.data, form.guest_id.data, form.time.data, Team.query.get(form.home_id.data).city,
-             GameStatus.SCHEDULED)
+    city = Team.query.get(form.home_id.data).city
+    g = Game(form.home_id.data, form.guest_id.data, form.time.data, city, GameStatus.SCHEDULED)
     db.session().add(g)
     db.session().commit()
 
@@ -59,8 +58,6 @@ def game_page(game_id):
             return save_modified_game_lineup(game_id)
         if 'add_goal' in set(request.form):
             return goals_create(game_id)
-        # if 'finish_game' in set(request.form):
-        #     return finish_game(game_id)
     else:
         return games_show_update_form(game_id)
 
@@ -76,7 +73,6 @@ def game_delete(game_id):
 @app.route("/games/<game_id>/finish", methods=["POST"])
 def finish_game(game_id):
     game = Game.query.get(game_id)
-    # copy_form_data_to_game(game, request.form)
     game.status = GameStatus.FINISHED
     db.session().commit()
 
@@ -119,18 +115,10 @@ def games_show_update_form(game_id, error=''):
         home_lineup_entries = [x for x in lineup_entries if x.membership_id in set([y.id for y in home_memberships])]
         guest_lineup_entries = [x for x in lineup_entries if x.membership_id in set([y.id for y in guest_memberships])]
         game_lineup_form = GameLineupForm()
-        populate_lineup_form(home_lineup_entries, home_memberships, game_lineup_form.home_lineup, game.time,
-                             game.status)
-        populate_lineup_form(guest_lineup_entries, guest_memberships, game_lineup_form.guest_lineup, game.time,
-                             game.status)
-        home_goals_form = GoalForm()
-        home_goals_form.team_id.data = game.home_id
-        home_goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in
-                                             home_lineup_entries]
-        guest_goals_form = GoalForm()
-        guest_goals_form.team_id.data = game.guest_id
-        guest_goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in
-                                              guest_lineup_entries]
+        populate_lineup_form(home_lineup_entries, home_memberships, game_lineup_form.home_lineup, game)
+        populate_lineup_form(guest_lineup_entries, guest_memberships, game_lineup_form.guest_lineup, game)
+        home_goals_form = populate_goal_form(game.home_id, home_lineup_entries)
+        guest_goals_form = populate_goal_form(game.guest_id, guest_lineup_entries)
         return render_page(
             "games/update.html",
             form=form,
@@ -149,8 +137,17 @@ def games_show_update_form(game_id, error=''):
     return render_page("games/update.html", form=form, game_id=game_id, game=game, error=error)
 
 
-def populate_lineup_form(lineup_entries, memberships, lineup_form, start_time, game_status):
+def populate_goal_form(home_id, lineup_entries):
+    goals_form = GoalForm()
+    goals_form.team_id.data = home_id
+    goals_form.scorer_id.choices = [format_lineup_entry_for_dropdown(lineup_entry) for lineup_entry in lineup_entries]
+    return goals_form
+
+
+def populate_lineup_form(lineup_entries, memberships, lineup_form, game: Game):
     # TODO check membership validity period
+    start_time = game.time
+    game_status = game.status
     for lineup_entry in lineup_entries:
         if len(lineup_form.lineup_entries) == lineup_max:
             break
@@ -209,8 +206,10 @@ def save_modified_game_lineup(game_id):
     game_lineup_form = GameLineupForm(request.form)
     valid = validate_game_lineup_form(game_lineup_form)
     if not valid:
-        return games_show_update_form(game_id, error='Lineup is not valid. Lineup contains atleast '
-                                                     + str(lineup_min) + ' and atmost ' + str(lineup_max) + ' entries.')
+        return games_show_update_form(
+            game_id,
+            error='Lineup is not valid. Lineup contains atleast ' + str(lineup_min) + ' and atmost '
+                  + str(lineup_max) + ' entries.')
     game = Game.query.get(game_id)
     form_membership_ids = []
     form_membership_ids.extend([x.membership_id.data for x in game_lineup_form.home_lineup.lineup_entries.entries])
@@ -255,3 +254,22 @@ def goals_create(game_id):
     db.session().commit()
 
     return redirect(url_for("game_page", game_id=game_id))
+
+
+def parse_time_from_view(view_time):
+    if ":" not in view_time:
+        raise ValueError("Could not find value separator")
+    times = view_time.split(":", 1)
+    try:
+        seconds = int(times[1])
+    except ValueError:
+        raise ValueError("Seconds was expected to be an integer")
+    try:
+        minutes = int(times[0])
+    except ValueError:
+        raise ValueError("Minutes was expected to be an integer")
+    if seconds < 0 or 60 <= seconds:
+        raise ValueError("Seconds was expected to be between 0 and 59")
+    if minutes < 0:
+        raise ValueError("Minutes was expected to non negative")
+    return datetime.time(hour=int(minutes / 60), minute=minutes % 60, second=seconds)

@@ -16,8 +16,7 @@ def auth_login():
 
     user = User.query.filter_by(username=form.username.data, password=form.password.data).first()
     if not user:
-        return render_template("auth/loginform.html", form=form,
-                               error="No such username or password")
+        return render_template("auth/loginform.html", form=form, error="No such username or password")
 
     login_user(user)
     return redirect(request.args.get("next") or url_for("index"))
@@ -38,16 +37,13 @@ def auth_register():
 
     user = User.query.filter_by(username=form.username.data).first()
     if user:
-        return render_template("auth/registrationform.html", form=form,
-                               error="User already exists")
+        return render_template("auth/registrationform.html", form=form, error="User already exists")
 
     if form.username.data == '':
-        return render_template("auth/registrationform.html", form=form,
-                               error="Username empty")
+        return render_template("auth/registrationform.html", form=form, error="Username empty")
 
     if form.password.data == '':
-        return render_template("auth/registrationform.html", form=form,
-                               error="Password empty")
+        return render_template("auth/registrationform.html", form=form, error="Password empty")
 
     user = User(form.name.data, form.username.data, form.password.data)
 
