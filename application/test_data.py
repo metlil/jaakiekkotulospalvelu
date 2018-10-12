@@ -16,7 +16,7 @@ def import_test_data():
         # otherwise this will import same data many times
         return
 
-    user = User("hello", "hello", "world")
+    user = User("Admin", "admin", "testdataadmin")
     db.session().add(user)
 
     team_hifk = Team("HIFK", "Helsinki")

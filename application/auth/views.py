@@ -27,8 +27,8 @@ def auth_logout():
     logout_user()
     return redirect(url_for("index"))
 
-
-@app.route("/auth/register", methods=["GET", "POST"])
+# Registration is allowed only for admin
+# @app.route("/auth/register", methods=["GET", "POST"])
 def auth_register():
     if request.method == "GET":
         return render_template("auth/registrationform.html", form=RegistrationForm())
