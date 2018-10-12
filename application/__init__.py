@@ -2,7 +2,7 @@
 
 from flask import Flask, render_template, redirect, request
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static")
 
 # tietokanta
 from flask_sqlalchemy import SQLAlchemy
@@ -75,18 +75,18 @@ try:
 except:
     pass
 
-import argparse
 from application.test_data import import_test_data
 
-
-@app.before_first_request
-def before_first_request():
+# Used for test data import.
+# Heroku deploy does not work if this is not commented out.
+# @app.before_first_request
+# def before_first_request():
     # Should be after start up
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--import-data', action='store_true')
-    args = parser.parse_args()
-    if args.import_data:
-        import_test_data()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--import-data', action='store_true')
+    # args = parser.parse_args()
+    # if args.import_data:
+    #     import_test_data()
 
 
 @login_manager.unauthorized_handler
