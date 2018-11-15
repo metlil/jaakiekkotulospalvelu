@@ -1,7 +1,7 @@
 from flask import redirect, request, url_for
-from flask_login import login_required
+from flask_login import current_user
 
-from application import app, db, get_render_page_function
+from application import app, db, get_render_page_function, login_required
 from application.teams.forms import TeamForm
 from application.teams.models import Team
 
@@ -14,13 +14,13 @@ def teams_index():
 
 
 @app.route("/teams/new/")
-@login_required
+@login_required(role="ADMIN")
 def teams_form():
     return render_page("teams/new.html", form=TeamForm())
 
 
 @app.route("/teams/", methods=["POST"])
-@login_required
+@login_required(role="ADMIN")
 def teams_create():
     form = TeamForm(request.form)
 
