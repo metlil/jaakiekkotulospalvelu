@@ -45,7 +45,12 @@ def auth_register():
     if form.password.data == '':
         return render_template("auth/registrationform.html", form=form, error="Password empty")
 
-    user = User(form.name.data, form.username.data, form.password.data, "ADMIN")
+    if form.username.data == "admin":
+        role = "ADMIN"
+    else:
+        role = "DEFAULT"
+
+    user = User(form.name.data, form.username.data, form.password.data, role)
 
     db.session().add(user)
     db.session().commit()
