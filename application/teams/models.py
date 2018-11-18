@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy.sql import text
 
 from application import db
@@ -20,6 +22,7 @@ class Team(db.Model):
 
     @staticmethod
     def find_current_players(team_id):
+        today = datetime.date.today().isoformat()
         stmt = text(
             "SELECT"
             "  Player.lastname,"
@@ -31,9 +34,16 @@ class Team(db.Model):
             "    ON Player.id = Membership.player_id "
             "WHERE"
             "  Membership.team_id = :team_id"
-            "  AND Membership.membership_end IS NULL "
+            "  AND ("
+            "    ("
+            "      Membership.membership_start < :today AND Membership.membership_end IS NULL"
+            "    )"
+            "    OR ("
+            "      :today BETWEEN Membership.membership_start AND Membership.membership_end"
+            "    )"
+            "  ) "
             "ORDER BY Player.lastname"
-        ).params(team_id=team_id)
+        ).params(team_id=team_id,today=today)
 
         res = db.engine.execute(stmt)
         response = []
