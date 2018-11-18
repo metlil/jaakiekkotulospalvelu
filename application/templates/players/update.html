@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    {% if current_user.is_authenticated %}
+    {% if current_user.role == "ADMIN" %}
         <div class="row">
             <h3>Player</h3>
         </div>
@@ -47,7 +47,7 @@
             </div>
         </div>
     {% endif %}
-    {% if current_user.is_authenticated %}
+    {% if current_user.role == "ADMIN" %}
         <div class="row">
             <form method="POST" action="{{ url_for('player_delete', player_id = player_id) }}">
                 <input type="submit" value="Delete player"/>

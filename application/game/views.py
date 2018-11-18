@@ -1,9 +1,9 @@
 import datetime
 
 from flask import request, redirect, url_for
-from flask_login import login_required
+from flask_login import current_user
 
-from application import app, db, get_render_page_function
+from application import app, db, get_render_page_function, login_required
 from application.game.forms import GameForm
 from application.game.game_status import GameStatus
 from application.game.models import Game
@@ -25,7 +25,7 @@ def games_index():
 
 
 @app.route("/games/new/")
-@login_required
+@login_required(role="ADMIN")
 def games_form():
     form = GameForm()
     teams = Team.query.order_by('name')
@@ -35,7 +35,7 @@ def games_form():
 
 
 @app.route("/games/", methods=["POST"])
-@login_required
+@login_required(role="ADMIN")
 def games_create():
     form = GameForm(request.form)
 
@@ -46,23 +46,25 @@ def games_create():
 
     return redirect(url_for("game_page", game_id=g.id))
 
+@app.route("/games/<game_id>/", methods=["POST"])
+@login_required(role="ADMIN")
+def game_page_modify(game_id):
+    if 'update_game' in set(request.form):
+        return games_save_modified_data(game_id)
+    if 'confirm_game' in set(request.form):
+        return confirm_game(game_id)
+    if 'confirm_lineup' in set(request.form):
+        return save_modified_game_lineup(game_id)
+    if 'add_goal' in set(request.form):
+        return goals_create(game_id)
 
-@app.route("/games/<game_id>/", methods=["GET", "POST"])
+@app.route("/games/<game_id>/", methods=["GET"])
 def game_page(game_id):
-    if request.method == 'POST':
-        if 'update_game' in set(request.form):
-            return games_save_modified_data(game_id)
-        if 'confirm_game' in set(request.form):
-            return confirm_game(game_id)
-        if 'confirm_lineup' in set(request.form):
-            return save_modified_game_lineup(game_id)
-        if 'add_goal' in set(request.form):
-            return goals_create(game_id)
-    else:
-        return games_show_update_form(game_id)
+    return games_show_update_form(game_id)
 
 
 @app.route("/games/<game_id>/delete", methods=["POST"])
+@login_required(role="ADMIN")
 def game_delete(game_id):
     game = Game.query.get(game_id)
     db.session().delete(game)
@@ -71,6 +73,7 @@ def game_delete(game_id):
 
 
 @app.route("/games/<game_id>/finish", methods=["POST"])
+@login_required(role="ADMIN")
 def finish_game(game_id):
     game = Game.query.get(game_id)
     game.status = GameStatus.FINISHED
