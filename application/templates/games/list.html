@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <a href="{{ url_for('games_form') }}">Add a game</a>
+    {% if current_user.role == "ADMIN" %}
+        <a href="{{ url_for('games_form') }}">Add a game</a>
+    {% endif %}
     <div class="col-8">
         <div class="row">
             <div class="col-3"><b>Home Team</b></div>

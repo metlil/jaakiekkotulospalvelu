@@ -12,7 +12,7 @@
 {%- endmacro %}
 
 {% macro goal_form(game_id, goal_form) %}
-    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+    <form method="POST" action="{{ url_for('game_page_modify', game_id = game_id) }}">
         <div class="row">
             <div class="col-2">
                 {{ goal_form.scorer_id.label }}

@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <a href="{{ url_for('teams_form') }}">Add a team</a>
+    {% if current_user.role == "ADMIN" %}
+        <a href="{{ url_for('teams_form') }}">Add a team</a>
+    {% endif %}
     <div>
         <div class="row">
             <div class="col-2"><b>Team name</b></div>

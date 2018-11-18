@@ -4,8 +4,8 @@
 {% block body %}
     <div class="row">
         <div class="col-4">
-            {% if current_user.is_authenticated %}
-                <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+            {% if current_user.role == "ADMIN" %}
+                <form method="POST" action="{{ url_for('game_page_modify', game_id = game_id) }}">
                     {% include 'games/game_basic_information.html' %}
                     {% if game.status.value=='SCHEDULED' %}
                         <div class="row">
@@ -35,8 +35,8 @@
         </div>
         {% if game.status.value!='SCHEDULED' %}
             <div class="col-8">
-                {% if current_user.is_authenticated %}
-                    <form method="POST" action="{{ url_for('game_page', game_id = game_id) }}">
+                {% if current_user.role == "ADMIN" %}
+                    <form method="POST" action="{{ url_for('game_page_modify', game_id = game_id) }}">
                     <div class="row">
                         <div class="col-6">
                             <h3>{{ game.home_team.name }} lineup</h3>
@@ -97,7 +97,7 @@
         {% if home_team_goals is defined %}
             <div class="col-6">
                 <h3>{{ game.home_team.name }} goals</h3>
-                {% if game.status.value == 'ONGOING' and current_user.is_authenticated %}
+                {% if game.status.value == 'ONGOING' and current_user.role == "ADMIN" %}
                     {{ goal_form(game_id, home_goals_form) }}
                 {% endif %}
                 {{ goals(home_team_goals) }}
@@ -106,14 +106,14 @@
         {% if guest_team_goals is defined %}
             <div class="col-6">
                 <h3>{{ game.guest_team.name }} goals</h3>
-                {% if game.status.value == 'ONGOING' and current_user.is_authenticated %}
+                {% if game.status.value == 'ONGOING' and current_user.role == "ADMIN" %}
                     {{ goal_form(game_id, guest_goals_form) }}
                 {% endif %}
                 {{ goals(guest_team_goals) }}
             </div>
         {% endif %}
     </div>
-    {% if current_user.is_authenticated %}
+    {% if current_user.role == "ADMIN" %}
         {% if game.status.value == 'ONGOING' %}
             <form method="POST" action="{{ url_for('finish_game', game_id = game_id) }}">
                 <input type="submit" value="Finish game"/>
