@@ -89,12 +89,13 @@ from application.lineup import models
 
 from application.auth import models
 from application.auth import views
+from application.usergame import models
+from application.usergame import views
 
 from application.game import models
 from application.game import views
 
 from application.goal import models
-from application.usergame import models
 
 # login functionality 2
 from application.auth.models import User
