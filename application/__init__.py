@@ -94,6 +94,7 @@ from application.game import models
 from application.game import views
 
 from application.goal import models
+from application.usergame import models
 
 # login functionality 2
 from application.auth.models import User
