@@ -63,4 +63,14 @@
             {% endfor %}
         </table>
     {% endif %}
+    <h2>My Game List</h2>
+    <ul>
+    {% for game in usergames %}
+        <li>
+            <a href="{{ url_for('game_page', game_id = game.game_id ) }}">
+                {{ game.home_name }} - {{ game.guest_name }}, {{ game.time }}, {{ game.place }}, {{ game.status }}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
 {% endblock %}
