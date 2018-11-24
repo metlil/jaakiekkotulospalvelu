@@ -1,6 +1,6 @@
 import datetime
 
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, session
 from flask_login import current_user
 
 from application import app, db, get_render_page_function, login_required
@@ -100,8 +100,7 @@ def add_user_game(game_id):
     user_game = UserGame(current_user.id, game_id)
     db.session().add(user_game)
     db.session().commit()
-    return redirect(url_for("games_index"))
-
+    return redirect(request.referrer or url_for("index"))
 
 @app.route("/usergames/<game_id>/remove", methods=["POST"])
 @login_required(role="ANY")
@@ -110,7 +109,7 @@ def remove_user_game(game_id):
     for user_game in user_games:
         db.session().delete(user_game)
     db.session().commit()
-    return redirect(url_for("games_index"))
+    return redirect(request.referrer or url_for("index"))
 
 
 def games_save_modified_data(game_id):
@@ -139,6 +138,9 @@ def games_show_update_form(game_id, error=''):
     form.guest_id.data = game.guest_id
     form.time.data = game.time
     # kun on vahvistettu
+    is_on_user_list = False
+    if current_user.is_authenticated:
+        is_on_user_list = len(UserGame.query.filter(UserGame.user_id == current_user.id, UserGame.game_id == game_id).all()) > 0
     if game.status != GameStatus.SCHEDULED:
         form.time.render_kw = {'disabled': True}
         form.home_id.render_kw = {'disabled': True}
@@ -165,10 +167,18 @@ def games_show_update_form(game_id, error=''):
             guest_goals_form=guest_goals_form,
             error=error,
             home_team_players=Game.team_lineup(game_id, game.home_id),
-            guest_team_players=Game.team_lineup(game_id, game.guest_id)
+            guest_team_players=Game.team_lineup(game_id, game.guest_id),
+            is_on_user_list=is_on_user_list
         )
 
-    return render_page("games/update.html", form=form, game_id=game_id, game=game, error=error)
+    return render_page(
+        "games/update.html",
+        form=form,
+        game_id=game_id,
+        game=game,
+        is_on_user_list=is_on_user_list,
+        error=error
+    )
 
 
 def populate_goal_form(home_id, lineup_entries):

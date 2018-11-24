@@ -2,6 +2,19 @@
 {% from 'games/game_macros.html' import lineup, goal_form, goals %}
 
 {% block body %}
+    {% if current_user.is_authenticated %}
+        <div class="row">
+            {% if is_on_user_list %}
+                <form method="POST" action="{{ url_for('remove_user_game', game_id = game.id ) }}">
+                    <input type="submit" value="Remove from list"/>
+                </form>
+            {% else %}
+                <form method="POST" action="{{ url_for('add_user_game', game_id = game.id ) }}">
+                    <input type="submit" value="Add to list"/>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
     <div class="row">
         <div class="col-4">
             {% if current_user.role == "ADMIN" %}
