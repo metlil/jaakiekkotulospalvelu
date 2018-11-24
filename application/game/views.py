@@ -13,6 +13,7 @@ from application.lineup.forms import GameLineupForm
 from application.lineup.models import LineupEntry
 from application.memberships.models import Membership
 from application.teams.models import Team
+from application.usergame.models import UserGame
 
 lineup_min = 3
 lineup_max = 3
@@ -21,7 +22,16 @@ render_page = get_render_page_function('games')
 
 @app.route("/games/", methods=["GET"])
 def games_index():
-    return render_page("games/list.html", games=Game.query.order_by(Game.time).all())
+    user_game_list = []
+    if current_user.is_authenticated:
+        user_game_list = [user_game.game_id for user_game in
+                          UserGame.query.filter(UserGame.user_id == current_user.id).all()]
+
+    return render_page(
+        "games/list.html",
+        games=Game.query.order_by(Game.time).all(),
+        user_game_list=user_game_list
+    )
 
 
 @app.route("/games/new/")
@@ -46,6 +56,7 @@ def games_create():
 
     return redirect(url_for("game_page", game_id=g.id))
 
+
 @app.route("/games/<game_id>/", methods=["POST"])
 @login_required(role="ADMIN")
 def game_page_modify(game_id):
@@ -57,6 +68,7 @@ def game_page_modify(game_id):
         return save_modified_game_lineup(game_id)
     if 'add_goal' in set(request.form):
         return goals_create(game_id)
+
 
 @app.route("/games/<game_id>/", methods=["GET"])
 def game_page(game_id):
@@ -80,6 +92,25 @@ def finish_game(game_id):
     db.session().commit()
 
     return redirect(url_for("game_page", game_id=game_id))
+
+
+@app.route("/usergames/<game_id>/add", methods=["POST"])
+@login_required(role="ANY")
+def add_user_game(game_id):
+    user_game = UserGame(current_user.id, game_id)
+    db.session().add(user_game)
+    db.session().commit()
+    return redirect(url_for("games_index"))
+
+
+@app.route("/usergames/<game_id>/remove", methods=["POST"])
+@login_required(role="ANY")
+def remove_user_game(game_id):
+    user_games = UserGame.query.filter(UserGame.user_id == current_user.id, UserGame.game_id == game_id).all()
+    for user_game in user_games:
+        db.session().delete(user_game)
+    db.session().commit()
+    return redirect(url_for("games_index"))
 
 
 def games_save_modified_data(game_id):
