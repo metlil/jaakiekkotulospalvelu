@@ -1,12 +1,17 @@
 # Jääkiekkotulospalvelu
+
+Harjoitustyönä tehty sovellus kurssille Tietokantasovellus, kevät 2018.
+Sovellus Herokussa:
 https://jaakiekkotulospalvelu.herokuapp.com/
+
+## Aihekuvaus
 
 Tarkoitus välittää jääkiekkopelien loppu- ja välituloksia reaaliaikaisesti. Tulospalvelutietokannasta saadaan
 raportteina päättyneen ja keskeneräisen ottelun maalit ja kokoonpano.
 Sieltä saadaan myös sarjataulukko, johon laskettu kaikkien joukkueiden pisteet (maalien, voittojen, häviöiden, tasapelien
 mukaan) ja järjestetty joukkueet alenevaan järjestykseen.
 
-Toimintoja
+## Toimintoja
 
 *   Ottelun luonti, muokkaus, poisto
 *   Joukkueiden luonti
@@ -17,3 +22,10 @@ Toimintoja
 *	kirjaajan kirjautuminen
 *	otteluiden tulokset
 *	sarjataulukko
+*   kirjautuneille käyttäjille oma lista eniten kiinnostavista peleistä
+
+## Linkit:
+
+User storyt:
+
+Tietokantakaavio:
