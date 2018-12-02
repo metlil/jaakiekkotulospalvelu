@@ -26,6 +26,6 @@ mukaan) ja järjestetty joukkueet alenevaan järjestykseen.
 
 ## Linkit:
 
-User storyt:
+[User storyt](documentation/user_stories.md)
 
-Tietokantakaavio:
+[Tietokantakaavio](documentation/jaakiekkotulospalvelu_database_diagram.pdf)
