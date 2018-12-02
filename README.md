@@ -30,6 +30,8 @@ tapahtuu navigointipalkin oikeasta kulmasta Log in -linkistä syöttämällä us
 
 ## Linkit:
 
+[Dokumentaatio](documentation/jaakiekkotulospalvelu_dokumentaatio.pdf)
+
 [User storyt](documentation/user_stories.md)
 
 [Tietokantakaavio](documentation/jaakiekkotulospalvelu_database_diagram.pdf)
