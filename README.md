@@ -24,6 +24,10 @@ mukaan) ja järjestetty joukkueet alenevaan järjestykseen.
 *	sarjataulukko
 *   kirjautuneille käyttäjille oma lista eniten kiinnostavista peleistä
 
+## Testaaminen
+Sovelluksen herokuun on lisätty admin käyttäjä testausta varten. Kirjautuminen
+tapahtuu navigointipalkin oikeasta kulmasta Log in -linkistä syöttämällä usernameksi "admin" ja salasanaksi "nimda".
+
 ## Linkit:
 
 [User storyt](documentation/user_stories.md)
